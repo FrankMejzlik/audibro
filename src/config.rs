@@ -8,8 +8,12 @@ use std::time::Duration;
 use cfg_if::cfg_if;
 use rand_chacha::ChaCha20Rng;
 use sha3::{Sha3_256, Sha3_512};
+use clap::Parser;
 // ---
-use crate::block_signer::BlockSigner;
+use hashsig::utils;
+use hashsig::BlockSigner;
+// ---
+use crate::config;
 
 /// A directory where the identity files lie (e.g. `BlockSigner` with secret & public keys).
 pub const ID_DIR: &str = ".identity/";
@@ -121,3 +125,68 @@ pub type BlockVerifierInst = BlockSigner<
     MsgHashFn,
     TreeHashFn,
 >;
+
+
+// ***
+// The clap config for command line arguments.
+// ***
+
+/// Modes in which the progarm can operate.
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum ProgramMode {
+    /// The broadcaster of the data.
+    Sender,
+    /// The subscriber to the broadcasters.
+    Receiver,
+}
+
+/// Define the CLI.
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+pub struct Args {
+    // --- required ---
+    /// What mode to launch the program in.
+    #[clap(value_enum)]
+    pub mode: ProgramMode,
+    /// The address of the sender.
+    #[clap()]
+    pub addr: String,
+
+    // --- optional ---
+    /// Seed used for the CSPRNG.
+    #[clap(short, long, default_value_t = 42)]
+    pub seed: u64,
+    /// The input source file (if none, STDIN for sender, network for receiver)
+    #[clap(short, long)]
+    pub input: Option<String>,
+    /// The output source file (if none, STDOUT for receiver, network for sender)
+    #[clap(short, long)]
+    pub output: Option<String>,
+    /// A desired number of key layers to use (for sender only)
+    #[clap(long, default_value_t = 8)]
+    pub layers: usize,
+}
+
+///
+/// Setups the logger so it ignores the debug & trace logs in the third-party libs.
+///
+pub fn setup_logger() -> Result<(), fern::InitError> {
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "[{}][{}] {}",
+                //chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                chrono::Local::now().format("%H:%M:%S"),
+                record.level(),
+                message
+            ))
+        })
+        // Disable all by default
+        .level(log::LevelFilter::Warn)
+        // Allow for this module
+        .level_for(utils::binary_name(), log::LevelFilter::Trace)
+        //.chain(std::io::stdout())
+        .chain(fern::log_file(format!("{}/output.log", config::LOGS_DIR))?)
+        .apply()?;
+    Ok(())
+}

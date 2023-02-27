@@ -1,20 +1,10 @@
 //!
 //! <PROJECT_NAME> is an implementation of the hash-based authentication protocol for streamed data.
 //!
-mod block_signer;
-mod common;
-mod config;
-mod diag_server;
-#[allow(clippy::assertions_on_constants)]
-mod horst;
-mod merkle_tree;
-mod net_receiver;
-mod net_sender;
 mod receiver;
 mod sender;
-mod traits;
-mod utils;
-
+mod config;
+// ---
 use std::fs::File;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -22,32 +12,18 @@ use std::sync::{
 };
 use std::thread;
 // ---
+use hashsig::{ReceiverTrait, SenderTrait};
 use clap::Parser;
-
+#[allow(unused_imports)]
+use hashsig::{debug, error, info, log_input, trace, warn};
 // ---
-use crate::common::{Args, ProgramMode};
-//use crate::diag_server::DiagServer;
-use crate::receiver::{Receiver, ReceiverParams};
-use crate::sender::{Sender, SenderParams};
-use crate::traits::{ReceiverTrait, SenderTrait};
+use crate::config::{Args, ProgramMode};
+use crate::receiver::{AudiBroReceiver, AudiBroReceiverParams};
+use crate::sender::{AudiBroSender, AudiBroSenderParams};
 
-#[allow(dead_code)]
-fn run_diag_server(_args: Args, _running: Arc<AtomicBool>) {
-    // info!("Running a diag server...");
-
-    // let mut diag_server = DiagServer::new("127.0.0.1:9000".parse().unwrap());
-
-    // while running.load(Ordering::Acquire) {
-    //     let msg = format!("{}", utils::unix_ts());
-    //     diag_server
-    //         .send_state(&msg)
-    //         .expect("Failed to send the message!");
-    //     thread::sleep(std::time::Duration::from_secs(1));
-    // }
-}
 
 fn run_sender(args: Args, running: Arc<AtomicBool>) {
-    let sender_params = SenderParams {
+    let sender_params = AudiBroSenderParams {
         seed: args.seed,
         layers: args.layers,
         addr: args.addr,
@@ -55,7 +31,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
     };
     info!("Running a sender with {sender_params:#?}");
 
-    let mut sender = Sender::new(sender_params);
+    let mut sender = AudiBroSender::new(sender_params);
 
     let output = args
         .output
@@ -81,13 +57,13 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
 }
 
 fn run_receiver(args: Args, running: Arc<AtomicBool>) {
-    let recv_params = ReceiverParams {
+    let recv_params = AudiBroReceiverParams {
         addr: args.addr,
         running,
     };
     info!("Running a receiver with {recv_params:#?}");
 
-    let mut receiver = Receiver::new(recv_params);
+    let mut receiver = AudiBroReceiver::new(recv_params);
 
     let input = args
         .input
@@ -145,7 +121,7 @@ fn init_application() -> Arc<AtomicBool> {
 }
 
 fn main() {
-    if let Err(e) = common::setup_logger() {
+    if let Err(e) = config::setup_logger() {
         info!("Unable to initialize the logger!\nERROR: {}", e);
     }
     let args = Args::parse();
