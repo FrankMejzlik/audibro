@@ -3,14 +3,16 @@
 //!
 
 use hashsig::{Receiver, ReceiverParams, ReceiverTrait};
-use std::io::{Read, Write};
+use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 // ---
-use xxhash_rust::xxh3::xxh3_64;
+use hashsig::Config;
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, trace, warn};
+
+use crate::config::{self, BlockSignerInst};
 
 #[derive(Debug)]
 pub struct AudiBroReceiverParams {
@@ -20,23 +22,34 @@ pub struct AudiBroReceiverParams {
 
 pub struct AudiBroReceiver {
     params: AudiBroReceiverParams,
-    receiver: Receiver,
+    receiver: Receiver<BlockSignerInst>,
 }
 
 impl AudiBroReceiver {
     pub fn new(params: AudiBroReceiverParams) -> Self {
-        let receiver = Receiver::new(ReceiverParams {
-            addr: params.addr.clone(),
-            running: params.running.clone(),
-        });
+        let config = Config {
+            id_dir: config::ID_DIR.into(),
+            id_filename: config::ID_FILENAME.into(),
+            logs_dir: config::LOGS_DIR.into(),
+            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
+            net_buffer_size: config::BUFFER_SIZE,
+            datagram_size: config::DATAGRAM_SIZE,
+            max_pks: config::MAX_PKS,
+        };
+        let receiver = Receiver::new(
+            ReceiverParams {
+                addr: params.addr.clone(),
+                running: params.running.clone(),
+            },
+            config,
+        );
 
         AudiBroReceiver { params, receiver }
     }
 
-    pub fn run(&mut self, output: &mut dyn Write, mut input: Option<impl Read>) {
+    pub fn run(&mut self, output: &mut dyn Write) {
         // The main loop as long as the app should run
         while self.params.running.load(Ordering::Acquire) {
-            
             let received_block = match self.receiver.receive() {
                 Ok(x) => x,
                 Err(e) => {
@@ -50,7 +63,7 @@ impl AudiBroReceiver {
                 .write_all(&received_block.data)
                 .expect("The output should be writable!");
             output.flush().expect("Should be flushable!");
-			debug!(tag: "received", "[{:?}] {}", received_block.sender, String::from_utf8_lossy(&received_block.data));
+            debug!(tag: "received", "[{:?}] {}", received_block.sender, String::from_utf8_lossy(&received_block.data));
         }
     }
 }

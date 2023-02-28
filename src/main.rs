@@ -1,9 +1,9 @@
 //!
 //! <PROJECT_NAME> is an implementation of the hash-based authentication protocol for streamed data.
 //!
+mod config;
 mod receiver;
 mod sender;
-mod config;
 // ---
 use std::fs::File;
 use std::sync::{
@@ -12,7 +12,6 @@ use std::sync::{
 };
 use std::thread;
 // ---
-use hashsig::{ReceiverTrait, SenderTrait};
 use clap::Parser;
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, log_input, trace, warn};
@@ -20,7 +19,6 @@ use hashsig::{debug, error, info, log_input, trace, warn};
 use crate::config::{Args, ProgramMode};
 use crate::receiver::{AudiBroReceiver, AudiBroReceiverParams};
 use crate::sender::{AudiBroSender, AudiBroSenderParams};
-
 
 fn run_sender(args: Args, running: Arc<AtomicBool>) {
     let sender_params = AudiBroSenderParams {
@@ -33,10 +31,6 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
 
     let mut sender = AudiBroSender::new(sender_params);
 
-    let output = args
-        .output
-        .map(|x| File::create(x).expect("File should be writable!"));
-
     // Use the desired input (STDIN or the provided file)
     match args.input {
         Some(input_file) => {
@@ -47,11 +41,11 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
                     panic!("Failed to open file: {:?}", e);
                 }
             };
-            sender.run(&mut file, output)
+            sender.run(&mut file)
         }
         None => {
             info!("Getting input from STDIN...");
-            sender.run(&mut std::io::stdin(), output)
+            sender.run(&mut std::io::stdin())
         }
     }
 }
@@ -65,10 +59,6 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
 
     let mut receiver = AudiBroReceiver::new(recv_params);
 
-    let input = args
-        .input
-        .map(|x| File::open(x).expect("File should be writable!"));
-
     // Use the desired input (STDOUT or the provided file)
     match args.output {
         Some(output_file) => {
@@ -79,11 +69,11 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
                     panic!("Failed to open file: {:?}", e);
                 }
             };
-            receiver.run(&mut file, input)
+            receiver.run(&mut file)
         }
         None => {
             info!("Putting output to STDOUT...");
-            receiver.run(&mut std::io::stdout(), input)
+            receiver.run(&mut std::io::stdout())
         }
     }
 }

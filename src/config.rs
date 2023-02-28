@@ -6,9 +6,9 @@ use std::time::Duration;
 
 // ---
 use cfg_if::cfg_if;
+use clap::Parser;
 use rand_chacha::ChaCha20Rng;
 use sha3::{Sha3_256, Sha3_512};
-use clap::Parser;
 // ---
 use hashsig::utils;
 use hashsig::BlockSigner;
@@ -28,7 +28,7 @@ pub const INPUT_DBG_DIR: &str = "logs/input/";
 pub const OUTPUT_DBG_DIR: &str = "logs/output/";
 
 /// How long we will keep the subscriber alive without receiving another heartbeat.
-pub const SUBSCRIBER_LIFETIME: u128 = 10_000;
+pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 /// Size of the buffer used to receive UDP datagrams.
 pub const BUFFER_SIZE: usize = 1024;
 /// Size of the datagram we send over the UDP prorocol.
@@ -100,7 +100,7 @@ const T: usize = 2_usize.pow(TAU as u32);
 const MSG_HASH_SIZE: usize = (K * TAU) / 8;
 const TREE_HASH_SIZE: usize = N;
 
-// Alias for the specific signer we'll be using
+// Alias for the specific signer/verifier we'll be using.
 pub type BlockSignerInst = BlockSigner<
     K,
     TAU,
@@ -112,20 +112,6 @@ pub type BlockSignerInst = BlockSigner<
     MsgHashFn,
     TreeHashFn,
 >;
-
-// Alias for the specific verifier we'll be using
-pub type BlockVerifierInst = BlockSigner<
-    K,
-    TAU,
-    { TAU + 1 },
-    T,
-    MSG_HASH_SIZE,
-    TREE_HASH_SIZE,
-    CsPrng,
-    MsgHashFn,
-    TreeHashFn,
->;
-
 
 // ***
 // The clap config for command line arguments.

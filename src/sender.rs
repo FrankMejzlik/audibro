@@ -2,7 +2,7 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
-use std::io::{Read, Write};
+use std::io::Read;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread;
@@ -11,9 +11,9 @@ use chrono::Local;
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, log_input, trace, warn};
-use hashsig::{Sender, SenderParams, SenderTrait};
+use hashsig::{Config, Sender, SenderParams, SenderTrait};
 // ---
-use crate::config;
+use crate::config::{self, BlockSignerInst};
 
 #[derive(Debug)]
 pub struct AudiBroSenderParams {
@@ -25,29 +25,40 @@ pub struct AudiBroSenderParams {
 
 pub struct AudiBroSender {
     params: AudiBroSenderParams,
-    sender: Sender,
+    sender: Sender<BlockSignerInst>,
 }
 
 impl AudiBroSender {
     pub fn new(params: AudiBroSenderParams) -> Self {
-        let sender = Sender::new(SenderParams {
-            addr: params.addr.clone(),
-            running: params.running.clone(),
-            layers: params.layers,
-            seed: params.seed,
-        });
-
+        let config = Config {
+            id_dir: config::ID_DIR.into(),
+            id_filename: config::ID_FILENAME.into(),
+            logs_dir: config::LOGS_DIR.into(),
+            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
+            net_buffer_size: config::BUFFER_SIZE,
+            datagram_size: config::DATAGRAM_SIZE,
+            max_pks: config::MAX_PKS,
+        };
+        let sender = Sender::new(
+            SenderParams {
+                addr: params.addr.clone(),
+                running: params.running.clone(),
+                layers: params.layers,
+                seed: params.seed,
+            },
+            config,
+        );
         AudiBroSender { params, sender }
     }
 
-    pub fn run(&mut self, input: &mut dyn Read, mut output: Option<impl Write>) {
+    pub fn run(&mut self, input: &mut dyn Read) {
         // The main loop as long as the app should run
         while self.params.running.load(Ordering::Acquire) {
             let data = Self::read_input(input);
 
             if let Err(e) = self.sender.broadcast(data) {
-				warn!("Failed to broadcast! ERROR: {e}");
-			}
+                warn!("Failed to broadcast! ERROR: {e}");
+            }
         }
     }
     // ---
