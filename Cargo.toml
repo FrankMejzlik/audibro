@@ -8,7 +8,7 @@ authors = ["Frantisek Mejzlik <frankmejzlik@proton.me>"]
 
 [dependencies]
 #hashsig = {git = "ssh://git@github.com/FrankMejzlik/hashsig.git", branch = "master" }
-hashsig = {path = "../hashsig/" }
+hashsig = {path = "../hashsig/", features=["log_input_output"] }
 clap = { version = "3.2", features = ["derive"] }
 sha3 = "0.10"
 rand_chacha = { version = "0.3.1", features=["serde1"]}
@@ -38,4 +38,3 @@ serde-big-array = "0.5"
 default = ["debug", "simulate_stdin"]
 debug = []
 simulate_stdin = []
-

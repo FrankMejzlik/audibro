@@ -35,7 +35,6 @@ pub const BUFFER_SIZE: usize = 1024;
 pub const DATAGRAM_SIZE: usize = 512;
 /// A maximum number of keys per layer stored at the receiver.
 pub const MAX_PKS: usize = 3;
-pub const SIM_INPUT_PERIOD: Duration = Duration::from_millis(500);
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",
@@ -50,6 +49,9 @@ pub const USED_LOG_TAGS: &[&str] = &[
     "fragmented_blocks",
     "block_verifier",
 ];
+/// A period in which the simulated STDIN input will be procuded.
+#[cfg(feature = "simulate_stdin")]
+pub const SIM_INPUT_PERIOD: Duration = Duration::from_millis(500);
 
 // ***************************************
 //             PARAMETERS
@@ -79,7 +81,7 @@ cfg_if! {
         /// Size of the hashes in a Merkle tree
         const N: usize = 256 / 8;
         /// Number of SK segments in signature
-        const K: usize = 128;
+        const K: usize = 8;
         /// Depth of the Merkle tree (without the root layer)
         const TAU: usize = 4;
 

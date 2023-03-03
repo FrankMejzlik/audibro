@@ -5,9 +5,7 @@
 use std::io::Read;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use std::thread;
 // ---
-use chrono::Local;
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, log_input, trace, warn};
@@ -68,6 +66,9 @@ impl AudiBroSender {
         let input_bytes;
         #[cfg(feature = "simulate_stdin")]
         {
+            use chrono::Local;
+            use std::thread;
+
             // We simulate periodic data coming via input
             thread::sleep(config::SIM_INPUT_PERIOD);
             let msg = Local::now().format("%d-%m-%Y %H:%M:%S").to_string();
@@ -76,7 +77,7 @@ impl AudiBroSender {
 
         #[cfg(not(feature = "simulate_stdin"))]
         {
-            let buf = vec![];
+            let mut buf = vec![];
             _input.read_to_end(&mut buf).expect("Fail!");
             input_bytes = buf;
         }
