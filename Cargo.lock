@@ -353,6 +353,7 @@ dependencies = [
  "slice-of-array",
  "tokio",
  "tungstenite",
+ "union-find-rs",
  "xxhash-rust",
 ]
 
@@ -952,6 +953,12 @@ name = "unicode-width"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0edd1e5b14653f783770bce4a4dabb4a5108a5370a5f5d8cfe8710c361f6c8b"
+
+[[package]]
+name = "union-find-rs"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d7cf5ae6c8635588ab0aa0ddd0ba68b7586c96cd00f8d12337071219f9c885f"
 
 [[package]]
 name = "url"
