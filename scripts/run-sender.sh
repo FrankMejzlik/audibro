@@ -7,4 +7,4 @@ fi
 echo "Running sender as $BUILD_TYPE..."
 
 cd env/sender/
-../../target/${BUILD_TYPE}/audibro sender "0.0.0.0:5555"
+../../target/${BUILD_TYPE}/audibro --seed 40 sender "0.0.0.0:5555" tonda

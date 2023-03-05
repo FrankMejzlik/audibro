@@ -54,6 +54,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
     let recv_params = AudiBroReceiverParams {
         addr: args.addr,
         running,
+        target_name: args.target_name,
     };
     info!("Running a receiver with {recv_params:#?}");
 

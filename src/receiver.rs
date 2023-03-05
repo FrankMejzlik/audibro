@@ -7,7 +7,6 @@ use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 // ---
-use hashsig::Config;
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, trace, warn};
@@ -18,6 +17,7 @@ use crate::config::{self, BlockSignerInst};
 pub struct AudiBroReceiverParams {
     pub addr: String,
     pub running: Arc<AtomicBool>,
+    pub target_name: String,
 }
 
 pub struct AudiBroReceiver {
@@ -27,22 +27,16 @@ pub struct AudiBroReceiver {
 
 impl AudiBroReceiver {
     pub fn new(params: AudiBroReceiverParams) -> Self {
-        let config = Config {
+        let receiver = Receiver::new(ReceiverParams {
+            running: params.running.clone(),
+            target_addr: params.addr.clone(),
+            target_name: params.target_name.clone(),
             id_dir: config::ID_DIR.into(),
             id_filename: config::ID_FILENAME.into(),
-            logs_dir: config::LOGS_DIR.into(),
-            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
-            net_buffer_size: config::BUFFER_SIZE,
             datagram_size: config::DATAGRAM_SIZE,
-            max_pks: config::MAX_PKS,
-        };
-        let receiver = Receiver::new(
-            ReceiverParams {
-                addr: params.addr.clone(),
-                running: params.running.clone(),
-            },
-            config,
-        );
+            net_buffer_size: config::BUFFER_SIZE,
+            pub_key_layer_limit: config::MAX_PKS,
+        });
 
         AudiBroReceiver { params, receiver }
     }

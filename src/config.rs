@@ -139,6 +139,8 @@ pub struct Args {
     /// The address of the sender.
     #[clap()]
     pub addr: String,
+    #[clap()]
+    pub target_name: String,
 
     // --- optional ---
     /// Seed used for the CSPRNG.

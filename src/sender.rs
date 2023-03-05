@@ -9,7 +9,7 @@ use std::sync::Arc;
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, log_input, trace, warn};
-use hashsig::{Config, Sender, SenderParams, SenderTrait};
+use hashsig::{Sender, SenderParams, SenderTrait};
 // ---
 use crate::config::{self, BlockSignerInst};
 
@@ -28,24 +28,17 @@ pub struct AudiBroSender {
 
 impl AudiBroSender {
     pub fn new(params: AudiBroSenderParams) -> Self {
-        let config = Config {
+        let sender = Sender::new(SenderParams {
+            addr: params.addr.clone(),
+            running: params.running.clone(),
+            layers: params.layers,
+            seed: params.seed,
             id_dir: config::ID_DIR.into(),
             id_filename: config::ID_FILENAME.into(),
-            logs_dir: config::LOGS_DIR.into(),
-            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
-            net_buffer_size: config::BUFFER_SIZE,
             datagram_size: config::DATAGRAM_SIZE,
-            max_pks: config::MAX_PKS,
-        };
-        let sender = Sender::new(
-            SenderParams {
-                addr: params.addr.clone(),
-                running: params.running.clone(),
-                layers: params.layers,
-                seed: params.seed,
-            },
-            config,
-        );
+            net_buffer_size: config::BUFFER_SIZE,
+            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
+        });
         AudiBroSender { params, sender }
     }
 
