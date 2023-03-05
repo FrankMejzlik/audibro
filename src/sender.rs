@@ -15,10 +15,13 @@ use crate::config::{self, BlockSignerInst};
 
 #[derive(Debug)]
 pub struct AudiBroSenderParams {
+    pub running: Arc<AtomicBool>,
     pub seed: u64,
     pub layers: usize,
+    /// An address where the sender will listen for heartbeats.
     pub addr: String,
-    pub running: Arc<AtomicBool>,
+    /// A number of signatures one keypair can generate.
+    pub key_lifetime: usize,
 }
 
 pub struct AudiBroSender {
@@ -38,6 +41,7 @@ impl AudiBroSender {
             datagram_size: config::DATAGRAM_SIZE,
             net_buffer_size: config::BUFFER_SIZE,
             subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
+            key_lifetime: params.key_lifetime,
         });
         AudiBroSender { params, sender }
     }

@@ -6,5 +6,5 @@ if [ "$1" = "release" ]; then
 fi
 echo "Running sender as $BUILD_TYPE..."
 
-cd env/sender/
-../../target/${BUILD_TYPE}/audibro --seed 40 sender "0.0.0.0:5555" tonda
+cd env/sender2/
+../../target/${BUILD_TYPE}/audibro --seed=42 --layers=3 --key-lifetime=3 sender "0.0.0.0:5556" lojza

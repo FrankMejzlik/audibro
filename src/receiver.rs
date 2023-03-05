@@ -15,9 +15,11 @@ use crate::config::{self, BlockSignerInst};
 
 #[derive(Debug)]
 pub struct AudiBroReceiverParams {
-    pub addr: String,
     pub running: Arc<AtomicBool>,
+    pub target_addr: String,
     pub target_name: String,
+    /// A number of signatures one keypair can generate.
+    pub key_lifetime: usize,
 }
 
 pub struct AudiBroReceiver {
@@ -29,13 +31,14 @@ impl AudiBroReceiver {
     pub fn new(params: AudiBroReceiverParams) -> Self {
         let receiver = Receiver::new(ReceiverParams {
             running: params.running.clone(),
-            target_addr: params.addr.clone(),
+            target_addr: params.target_addr.clone(),
             target_name: params.target_name.clone(),
             id_dir: config::ID_DIR.into(),
             id_filename: config::ID_FILENAME.into(),
             datagram_size: config::DATAGRAM_SIZE,
             net_buffer_size: config::BUFFER_SIZE,
             pub_key_layer_limit: config::MAX_PKS,
+            key_lifetime: params.key_lifetime,
         });
 
         AudiBroReceiver { params, receiver }

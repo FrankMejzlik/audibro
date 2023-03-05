@@ -22,10 +22,11 @@ use crate::sender::{AudiBroSender, AudiBroSenderParams};
 
 fn run_sender(args: Args, running: Arc<AtomicBool>) {
     let sender_params = AudiBroSenderParams {
+        running,
         seed: args.seed,
         layers: args.layers,
         addr: args.addr,
-        running,
+        key_lifetime: args.key_lifetime,
     };
     info!("Running a sender with {sender_params:#?}");
 
@@ -52,9 +53,10 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
 
 fn run_receiver(args: Args, running: Arc<AtomicBool>) {
     let recv_params = AudiBroReceiverParams {
-        addr: args.addr,
         running,
+        target_addr: args.addr,
         target_name: args.target_name,
+        key_lifetime: args.key_lifetime,
     };
     info!("Running a receiver with {recv_params:#?}");
 
