@@ -105,9 +105,9 @@ fn init_application() -> Arc<AtomicBool> {
     .expect("Error setting Ctrl-C handler");
 
     for t in config::USED_LOG_TAGS {
-        trace!(tag: t, "+++++++++++++++++++++++++++++++++");
-        trace!(tag: t, "+++++++++ PROGRAM START +++++++++");
-        trace!(tag: t, "+++++++++++++++++++++++++++++++++");
+        info!(tag: t, "+++++++++++++++++++++++++++++++++");
+        info!(tag: t, "+++++++++ PROGRAM START +++++++++");
+        info!(tag: t, "+++++++++++++++++++++++++++++++++");
     }
 
     running
