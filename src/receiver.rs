@@ -20,6 +20,7 @@ pub struct AudiBroReceiverParams {
     pub target_name: String,
     /// A number of signatures one keypair can generate.
     pub key_lifetime: usize,
+    pub cert_interval: usize,
 }
 
 pub struct AudiBroReceiver {
@@ -39,6 +40,7 @@ impl AudiBroReceiver {
             net_buffer_size: config::BUFFER_SIZE,
             pub_key_layer_limit: config::MAX_PKS,
             key_lifetime: params.key_lifetime,
+            cert_interval: params.cert_interval,
         });
 
         AudiBroReceiver { params, receiver }

@@ -51,7 +51,8 @@ pub const USED_LOG_TAGS: &[&str] = &[
 ];
 /// A period in which the simulated STDIN input will be procuded.
 #[cfg(feature = "simulate_stdin")]
-pub const SIM_INPUT_PERIOD: Duration = Duration::from_millis(5000);
+pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(100));
+//pub const SIM_INPUT_PERIOD: Option<Duration> = None;
 
 // ***************************************
 //             PARAMETERS
@@ -155,6 +156,9 @@ pub struct Args {
     /// A desired number of key layers to use (for sender only)
     #[clap(long, default_value_t = 8)]
     pub layers: usize,
+    /// A number of keys to certify forward (and backward).
+    #[clap(long, default_value_t = 1)]
+    pub cert_interval: usize,
     /// A number of signatures one keypair can generate.
     #[clap(long, default_value_t = 20)]
     pub key_lifetime: usize,

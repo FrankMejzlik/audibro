@@ -27,6 +27,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
         layers: args.layers,
         addr: args.addr,
         key_lifetime: args.key_lifetime,
+        cert_interval: args.cert_interval,
     };
     info!("Running a sender with {sender_params:#?}");
 
@@ -57,6 +58,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         target_addr: args.addr,
         target_name: args.target_name,
         key_lifetime: args.key_lifetime,
+        cert_interval: args.cert_interval,
     };
     info!("Running a receiver with {recv_params:#?}");
 

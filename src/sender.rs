@@ -2,7 +2,8 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
-use std::io::Read;
+use std::io::BufRead;
+use std::io::{stdin, Read};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 // ---
@@ -22,6 +23,7 @@ pub struct AudiBroSenderParams {
     pub addr: String,
     /// A number of signatures one keypair can generate.
     pub key_lifetime: usize,
+    pub cert_interval: usize,
 }
 
 pub struct AudiBroSender {
@@ -42,6 +44,7 @@ impl AudiBroSender {
             net_buffer_size: config::BUFFER_SIZE,
             subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
             key_lifetime: params.key_lifetime,
+            cert_interval: params.cert_interval,
         });
         AudiBroSender { params, sender }
     }
@@ -66,8 +69,15 @@ impl AudiBroSender {
             use chrono::Local;
             use std::thread;
 
-            // We simulate periodic data coming via input
-            thread::sleep(config::SIM_INPUT_PERIOD);
+            if let Some(x) = config::SIM_INPUT_PERIOD {
+                // We simulate periodic data coming via input
+                thread::sleep(x);
+            } else {
+                let mut handle = stdin().lock();
+                let mut input = String::new();
+                handle.read_line(&mut input).expect("Failed to read line");
+            }
+
             let msg = Local::now().format("%d-%m-%Y %H:%M:%S").to_string();
             input_bytes = msg.into_bytes();
         }
