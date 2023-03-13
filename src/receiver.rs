@@ -6,6 +6,7 @@ use hashsig::{Receiver, ReceiverParams, ReceiverTrait};
 use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::time::Duration;
 // ---
 // ---
 #[allow(unused_imports)]
@@ -21,6 +22,7 @@ pub struct AudiBroReceiverParams {
     /// A number of signatures one keypair can generate.
     pub key_lifetime: usize,
     pub cert_interval: usize,
+    pub delivery_deadline: Duration,
 }
 
 pub struct AudiBroReceiver {
@@ -41,6 +43,7 @@ impl AudiBroReceiver {
             pub_key_layer_limit: config::MAX_PKS,
             key_lifetime: params.key_lifetime,
             cert_interval: params.cert_interval,
+            delivery_deadline: params.delivery_deadline,
         });
 
         AudiBroReceiver { params, receiver }

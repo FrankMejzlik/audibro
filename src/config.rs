@@ -51,7 +51,7 @@ pub const USED_LOG_TAGS: &[&str] = &[
 ];
 /// A period in which the simulated STDIN input will be procuded.
 #[cfg(feature = "simulate_stdin")]
-pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(100));
+pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(1000));
 //pub const SIM_INPUT_PERIOD: Option<Duration> = None;
 
 // ***************************************
@@ -162,6 +162,9 @@ pub struct Args {
     /// A number of signatures one keypair can generate.
     #[clap(long, default_value_t = 20)]
     pub key_lifetime: usize,
+    /// Maximum delay between delivery of messages (in milliseconds)
+    #[clap(long, default_value_t = 5000)]
+    pub delivery_deadline_ms: u64,
 }
 
 ///

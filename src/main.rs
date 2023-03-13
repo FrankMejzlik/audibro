@@ -11,6 +11,7 @@ use std::sync::{
     Arc,
 };
 use std::thread;
+use std::time::Duration;
 // ---
 use clap::Parser;
 #[allow(unused_imports)]
@@ -59,6 +60,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         target_name: args.target_name,
         key_lifetime: args.key_lifetime,
         cert_interval: args.cert_interval,
+        delivery_deadline: Duration::from_millis(args.delivery_deadline_ms),
     };
     info!("Running a receiver with {recv_params:#?}");
 
