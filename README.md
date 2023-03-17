@@ -92,6 +92,7 @@ tail -f ./env/receiver/logs/receiver.log
 tail -f ./env/receiver/logs/received.log
 # The state of the public keys in the keystore
 tail -f ./env/receiver/logs/block_verifier.log
+tail -f ./env/receiver/logs/delivery_queues.log
 # ---
 # The task sending periodic heartbeats to the sender
 tail -f ./env/receiver/logs/heartbeat_task.log

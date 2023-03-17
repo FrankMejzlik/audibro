@@ -24,6 +24,7 @@ pub struct AudiBroSenderParams {
     /// A number of signatures one keypair can generate.
     pub key_lifetime: usize,
     pub cert_interval: usize,
+    pub max_piece_size: usize,
 }
 
 pub struct AudiBroSender {
@@ -45,6 +46,7 @@ impl AudiBroSender {
             subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
             key_lifetime: params.key_lifetime,
             cert_interval: params.cert_interval,
+            max_piece_size: params.max_piece_size,
         });
         AudiBroSender { params, sender }
     }

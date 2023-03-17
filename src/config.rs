@@ -30,9 +30,10 @@ pub const OUTPUT_DBG_DIR: &str = "logs/output/";
 /// How long we will keep the subscriber alive without receiving another heartbeat.
 pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 /// Size of the buffer used to receive UDP datagrams.
-pub const BUFFER_SIZE: usize = 1024;
+pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
-pub const DATAGRAM_SIZE: usize = 512;
+///pub const DATAGRAM_SIZE: usize = 512;
+pub const DATAGRAM_SIZE: usize = 2_usize.pow(16);
 /// A maximum number of keys per layer stored at the receiver.
 pub const MAX_PKS: usize = 3;
 /// List of logging tags that we use throuought the program.
@@ -48,11 +49,12 @@ pub const USED_LOG_TAGS: &[&str] = &[
     "received",
     "fragmented_blocks",
     "block_verifier",
+    "delivery_queues",
 ];
 /// A period in which the simulated STDIN input will be procuded.
 #[cfg(feature = "simulate_stdin")]
-pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(1000));
-//pub const SIM_INPUT_PERIOD: Option<Duration> = None;
+//pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(10));
+pub const SIM_INPUT_PERIOD: Option<Duration> = None;
 
 // ***************************************
 //             PARAMETERS
@@ -163,8 +165,11 @@ pub struct Args {
     #[clap(long, default_value_t = 20)]
     pub key_lifetime: usize,
     /// Maximum delay between delivery of messages (in milliseconds)
-    #[clap(long, default_value_t = 5000)]
+    #[clap(long, default_value_t = 100)]
     pub delivery_deadline_ms: u64,
+    /// Maximum size of one piece to be broadcasted.
+    #[clap(long, default_value_t = 1024*1024)]
+    pub max_piece_size: usize,
 }
 
 ///

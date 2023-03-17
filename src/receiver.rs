@@ -65,7 +65,7 @@ impl AudiBroReceiver {
                 .write_all(&received_block.data)
                 .expect("The output should be writable!");
             output.flush().expect("Should be flushable!");
-            debug!(tag: "received", "[{:?}] {}", received_block.sender, String::from_utf8_lossy(&received_block.data));
+            debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, String::from_utf8_lossy(&received_block.data));
         }
     }
 }

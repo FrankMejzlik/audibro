@@ -10,8 +10,8 @@ authors = ["Frantisek Mejzlik <frankmejzlik@proton.me>"]
 #hashsig = {git = "ssh://git@github.com/FrankMejzlik/hashsig.git", branch = "master" }
 hashsig = { path = "../hashsig/", features = [
 	"log_input_output",
-	"simulate_out_of_order",
-	"simulate_fake_msgs",
+	#"simulate_out_of_order",
+	#"simulate_fake_msgs",
 	"log_input_output",
 ] }
 clap = { version = "3.2", features = ["derive"] }

@@ -29,6 +29,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
         addr: args.addr,
         key_lifetime: args.key_lifetime,
         cert_interval: args.cert_interval,
+        max_piece_size: args.max_piece_size,
     };
     info!("Running a sender with {sender_params:#?}");
 
