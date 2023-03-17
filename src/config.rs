@@ -146,6 +146,9 @@ pub struct Args {
     pub target_name: String,
 
     // --- optional ---
+    /// If set, the sender runs in TUI mode.
+    #[clap(short, long, action)]
+    pub tui: bool,
     /// Seed used for the CSPRNG.
     #[clap(short, long, default_value_t = 42)]
     pub seed: u64,
@@ -187,7 +190,7 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
             ))
         })
         // Disable all by default
-        .level(log::LevelFilter::Warn)
+        .level(log::LevelFilter::Info) // TODO: This does now work properly
         // Allow for this module
         .level_for(utils::binary_name(), log::LevelFilter::Trace)
         //.chain(std::io::stdout())
