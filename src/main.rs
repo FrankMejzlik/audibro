@@ -1,9 +1,12 @@
 //!
 //! <PROJECT_NAME> is an implementation of the hash-based authentication protocol for streamed data.
 //!
+mod audio_source;
 mod config;
 mod receiver;
 mod sender;
+mod sliding_buffer;
+mod tui;
 // ---
 use std::fs::File;
 use std::sync::{

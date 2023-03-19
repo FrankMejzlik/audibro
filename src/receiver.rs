@@ -3,6 +3,7 @@
 //!
 
 use hashsig::{Receiver, ReceiverParams, ReceiverTrait};
+use rodio::Decoder as RodioDecoder;
 use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -13,6 +14,7 @@ use std::time::Duration;
 use hashsig::{debug, error, info, trace, warn};
 
 use crate::config::{self, BlockSignerInst};
+use crate::sliding_buffer::SlidingBuffer;
 
 #[derive(Debug)]
 pub struct AudiBroReceiverParams {
@@ -49,7 +51,33 @@ impl AudiBroReceiver {
         AudiBroReceiver { params, receiver }
     }
 
-    pub fn run(&mut self, output: &mut dyn Write) {
+    pub fn run(&mut self, _output: &mut dyn Write) {
+        let my_buffer = SlidingBuffer::new();
+        let my_buffer_clone = my_buffer.clone();
+
+        std::thread::spawn(move || loop {
+            if my_buffer.len() < 100_000 {
+                std::thread::sleep(Duration::from_millis(100));
+                continue;
+            }
+            let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
+            let sink = rodio::Sink::try_new(&handle).unwrap();
+
+            let source = match RodioDecoder::new(my_buffer.clone()) {
+                Ok(x) => x,
+
+                Err(_) => {
+                    println!("Waiting for data!");
+                    std::thread::sleep(Duration::from_millis(1000));
+                    continue;
+                }
+            };
+
+            sink.append(source);
+            sink.sleep_until_end();
+            std::thread::sleep(Duration::from_millis(100));
+        });
+
         // The main loop as long as the app should run
         while self.params.running.load(Ordering::Acquire) {
             let received_block = match self.receiver.receive() {
@@ -61,10 +89,11 @@ impl AudiBroReceiver {
             };
 
             // OUTPUT
-            output
-                .write_all(&received_block.data)
-                .expect("The output should be writable!");
-            output.flush().expect("Should be flushable!");
+            my_buffer_clone.append(&received_block.data);
+            // output
+            //     .write_all(&received_block.data)
+            //     .expect("The output should be writable!");
+            // output.flush().expect("Should be flushable!");
             debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, String::from_utf8_lossy(&received_block.data));
         }
     }

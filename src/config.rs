@@ -33,7 +33,7 @@ pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
 ///pub const DATAGRAM_SIZE: usize = 512;
-pub const DATAGRAM_SIZE: usize = 2_usize.pow(16);
+pub const DATAGRAM_SIZE: usize = 2_usize.pow(16) / 2;
 /// A maximum number of keys per layer stored at the receiver.
 pub const MAX_PKS: usize = 3;
 /// List of logging tags that we use throuought the program.
