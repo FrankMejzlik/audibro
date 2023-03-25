@@ -30,6 +30,7 @@ pub struct AudiBroSenderParams {
     pub cert_interval: usize,
     pub max_piece_size: usize,
     pub tui: bool,
+    pub key_dist: Vec<Vec<usize>>,
 }
 
 pub struct AudiBroSender {
@@ -52,6 +53,7 @@ impl AudiBroSender {
             key_lifetime: params.key_lifetime,
             cert_interval: params.cert_interval,
             max_piece_size: params.max_piece_size,
+            key_dist: params.key_dist.clone(),
         });
         AudiBroSender { params, sender }
     }

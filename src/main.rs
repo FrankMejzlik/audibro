@@ -19,12 +19,13 @@ use std::time::Duration;
 use clap::Parser;
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, log_input, trace, warn};
+use serde::{Deserialize, Serialize};
 // ---
 use crate::config::{Args, ProgramMode};
 use crate::receiver::{AudiBroReceiver, AudiBroReceiverParams};
 use crate::sender::{AudiBroSender, AudiBroSenderParams};
 
-fn run_sender(args: Args, running: Arc<AtomicBool>) {
+fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
     let sender_params = AudiBroSenderParams {
         running,
         seed: args.seed,
@@ -34,6 +35,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>) {
         cert_interval: args.cert_interval,
         max_piece_size: args.max_piece_size,
         tui: args.tui,
+        key_dist: file_config.key_dist,
     };
     info!("Running a sender with {sender_params:#?}");
 
@@ -122,16 +124,27 @@ fn init_application() -> Arc<AtomicBool> {
     running
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct FileConfig {
+    key_dist: Vec<Vec<usize>>,
+}
+
 fn main() {
     if let Err(e) = config::setup_logger() {
         info!("Unable to initialize the logger!\nERROR: {}", e);
     }
+
+    // Override with cmd args
+    // TODO
     let args = Args::parse();
     let running = init_application();
 
+    let config_str = std::fs::read_to_string(&args.config).expect("Failed to read config file");
+    let config: FileConfig = toml::from_str(&config_str).expect("Failed to parse config file");
+
     // Sender mode
     match args.mode {
-        ProgramMode::Sender => run_sender(args, running),
+        ProgramMode::Sender => run_sender(args, running, config),
         ProgramMode::Receiver => run_receiver(args, running),
     }
 }

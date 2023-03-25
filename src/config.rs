@@ -173,6 +173,8 @@ pub struct Args {
     /// Maximum size of one piece to be broadcasted.
     #[clap(long, default_value_t = 1024*1024)]
     pub max_piece_size: usize,
+    #[clap(short, long, default_value = "../../config.toml")]
+    pub config: String,
 }
 
 ///
