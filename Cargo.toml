@@ -12,15 +12,15 @@ hashsig = { path = "../hashsig/", features = [
 	"log_input_output",
 	#"simulate_out_of_order",
 	#"simulate_fake_msgs",
-	"log_input_output",
 ] }
 clap = { version = "3.2", features = ["derive"] }
 sha3 = "0.10"
+sha2 = "0.10"
 rand_chacha = { version = "0.3.1", features = ["serde1"] }
 rand_core = "0.6.4"
 log = { version = "0.4", features = [
 	"max_level_debug",
-	"release_max_level_off",
+	"release_max_level_debug",
 ] }
 hex = "0.4"
 chrono = "0.4"

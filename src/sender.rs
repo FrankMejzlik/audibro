@@ -2,6 +2,7 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
+use rand::RngCore;
 use std::io::stdin;
 use std::io::BufRead;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -94,6 +95,10 @@ impl AudiBroSender {
             use chrono::Local;
             use std::thread;
 
+            let mut rng = rand::thread_rng();
+            let mut buffer = vec![0u8; 512 * 1024 * 1024]; // 5 MiB buffer
+            rng.fill_bytes(&mut buffer);
+
             if let Some(x) = config::SIM_INPUT_PERIOD {
                 // We simulate periodic data coming via input
                 thread::sleep(x);
@@ -105,6 +110,7 @@ impl AudiBroSender {
 
             let msg = Local::now().format("%d-%m-%Y %H:%M:%S").to_string();
             input_bytes = msg.into_bytes();
+            input_bytes = buffer
         }
 
         #[cfg(not(feature = "simulate_stdin"))]
@@ -116,7 +122,6 @@ impl AudiBroSender {
             input_bytes = input.into_bytes();
         }
 
-        debug!(tag: "broadcasted", "{}", String::from_utf8_lossy(&input_bytes));
         input_bytes
     }
 
@@ -130,7 +135,6 @@ impl AudiBroSender {
             Err(_e) => panic!("The input is dead!"),
         };
 
-        debug!(tag: "broadcasted", "{}", String::from_utf8_lossy(&input_bytes));
         input_bytes
     }
 }

@@ -10,6 +10,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 // ---
+use sha2::{Digest, Sha256};
 // ---
 #[allow(unused_imports)]
 use hashsig::{debug, error, info, trace, warn};
@@ -100,39 +101,47 @@ impl AudiBroReceiver {
             } else {
                 let mut handle = stdout().lock();
 
+                let mut hasher = Sha256::new();
+                hasher.update(&received_block.data);
+                let result = hasher.finalize();
+                let hash = format!("{:x}", result);
+
+                let size = received_block.data.len();
+
                 match &received_block.sender {
                     MsgVerification::Verified(id) => {
                         writeln!(
                             handle,
-                            "{};verified;{};{}",
+                            "{};verified;{};{};{}",
                             received_block.metadata.seq,
                             id.petnames.join(","),
-                            String::from_utf8_lossy(&received_block.data)
+                            size,
+                            hash
                         )
                         .unwrap();
                     }
                     MsgVerification::Certified(id) => {
                         writeln!(
                             handle,
-                            "{};certified;{};{}",
+                            "{};certified;{};{};{}",
                             received_block.metadata.seq,
                             id.petnames.join(","),
-                            String::from_utf8_lossy(&received_block.data)
+                            size,
+                            hash
                         )
                         .unwrap();
                     }
                     MsgVerification::Unverified => {
                         writeln!(
                             handle,
-                            "{};unverified;;{}",
-                            received_block.metadata.seq,
-                            String::from_utf8_lossy(&received_block.data)
+                            "{};unverified;;{};{}",
+                            received_block.metadata.seq, size, hash
                         )
                         .unwrap();
                     }
                 }
             }
-            debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, String::from_utf8_lossy(&received_block.data));
+            debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, &received_block.data.len());
         }
     }
 }
