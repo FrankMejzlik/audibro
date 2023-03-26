@@ -20,7 +20,7 @@ rand_chacha = { version = "0.3.1", features = ["serde1"] }
 rand_core = "0.6.4"
 log = { version = "0.4", features = [
 	"max_level_debug",
-	"release_max_level_info",
+	"release_max_level_off",
 ] }
 hex = "0.4"
 chrono = "0.4"
@@ -44,6 +44,6 @@ rodio = "0.17"
 toml = "0.7"
 
 [features]
-default = ["debug", "simulate_stdin"]
+default = ["debug"]
 debug = []
 simulate_stdin = []

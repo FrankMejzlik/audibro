@@ -2,8 +2,8 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
+use std::io::stdin;
 use std::io::BufRead;
-use std::io::{stdin, Read};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{channel, Receiver as MpscReceiver};
 use std::sync::Arc;
@@ -58,7 +58,7 @@ impl AudiBroSender {
         AudiBroSender { params, sender }
     }
 
-    pub fn run(&mut self, input: &mut dyn Read) {
+    pub fn run(&mut self) {
         let (tx, mut rx) = channel();
 
         if self.params.tui {
@@ -72,11 +72,11 @@ impl AudiBroSender {
         while self.params.running.load(Ordering::Acquire) {
             // Get the data to broadcast from TUI mode
             let data = if self.params.tui {
-                Self::read_input_tui(input, &mut rx)
+                Self::read_input_tui(&mut rx)
             }
             // Else get data from stream mode
             else {
-                Self::read_input(input)
+                Self::read_input()
             };
 
             if let Err(e) = self.sender.broadcast(data) {
@@ -87,7 +87,7 @@ impl AudiBroSender {
     // ---
 
     /// Reads the available chunk of data from the provided input.
-    fn read_input(_input: &mut dyn Read) -> Vec<u8> {
+    fn read_input() -> Vec<u8> {
         let input_bytes;
         #[cfg(feature = "simulate_stdin")]
         {
@@ -109,9 +109,11 @@ impl AudiBroSender {
 
         #[cfg(not(feature = "simulate_stdin"))]
         {
-            let mut buf = vec![];
-            _input.read_to_end(&mut buf).expect("Fail!");
-            input_bytes = buf;
+            let mut handle = stdin().lock();
+            let mut input = String::new();
+            handle.read_line(&mut input).expect("Failed to read line");
+            input.pop();
+            input_bytes = input.into_bytes();
         }
 
         debug!(tag: "broadcasted", "{}", String::from_utf8_lossy(&input_bytes));
@@ -121,7 +123,7 @@ impl AudiBroSender {
     ///
     /// Runs the TUI and periodically sends the input data to broadcast.
     ///
-    fn read_input_tui(_input: &mut dyn Read, rx: &mut MpscReceiver<Vec<u8>>) -> Vec<u8> {
+    fn read_input_tui(rx: &mut MpscReceiver<Vec<u8>>) -> Vec<u8> {
         // Wait for the data
         let input_bytes = match rx.recv() {
             Ok(x) => x,

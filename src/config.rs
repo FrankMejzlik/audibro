@@ -152,12 +152,6 @@ pub struct Args {
     /// Seed used for the CSPRNG.
     #[clap(short, long, default_value_t = 42)]
     pub seed: u64,
-    /// The input source file (if none, STDIN for sender, network for receiver)
-    #[clap(short, long)]
-    pub input: Option<String>,
-    /// The output source file (if none, STDOUT for receiver, network for sender)
-    #[clap(short, long)]
-    pub output: Option<String>,
     /// A desired number of key layers to use (for sender only)
     #[clap(long, default_value_t = 8)]
     pub layers: usize,
@@ -181,6 +175,8 @@ pub struct Args {
 /// Setups the logger so it ignores the debug & trace logs in the third-party libs.
 ///
 pub fn setup_logger() -> Result<(), fern::InitError> {
+    std::fs::create_dir_all(config::LOGS_DIR).expect("The logs directory should be created.");
+
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(

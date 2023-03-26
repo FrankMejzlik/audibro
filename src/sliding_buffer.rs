@@ -25,7 +25,6 @@ impl SlidingBuffer {
         let buffer = self.buffer.lock().unwrap();
         buffer.len()
     }
-    pub fn trim() {}
 }
 
 impl Read for SlidingBuffer {

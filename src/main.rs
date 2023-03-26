@@ -8,7 +8,6 @@ mod sender;
 mod sliding_buffer;
 mod tui;
 // ---
-use std::fs::File;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
@@ -41,23 +40,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
 
     let mut sender = AudiBroSender::new(sender_params);
 
-    // Use the desired input (STDIN or the provided file)
-    match args.input {
-        Some(input_file) => {
-            info!("Getting input from the file '{}'...", input_file);
-            let mut file = match File::open(input_file) {
-                Ok(file) => file,
-                Err(e) => {
-                    panic!("Failed to open file: {:?}", e);
-                }
-            };
-            sender.run(&mut file)
-        }
-        None => {
-            info!("Getting input from STDIN...");
-            sender.run(&mut std::io::stdin())
-        }
-    }
+    sender.run();
 }
 
 fn run_receiver(args: Args, running: Arc<AtomicBool>) {
@@ -74,23 +57,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
 
     let mut receiver = AudiBroReceiver::new(recv_params);
 
-    // Use the desired input (STDOUT or the provided file)
-    match args.output {
-        Some(output_file) => {
-            info!("Putting output to the file '{}'...", output_file);
-            let mut file = match File::create(output_file) {
-                Ok(file) => file,
-                Err(e) => {
-                    panic!("Failed to open file: {:?}", e);
-                }
-            };
-            receiver.run(&mut file)
-        }
-        None => {
-            info!("Putting output to STDOUT...");
-            receiver.run(&mut std::io::stdout())
-        }
-    }
+    receiver.run();
 }
 
 fn init_application() -> Arc<AtomicBool> {
@@ -132,7 +99,7 @@ struct FileConfig {
 
 fn main() {
     if let Err(e) = config::setup_logger() {
-        info!("Unable to initialize the logger!\nERROR: {}", e);
+        panic!("Unable to initialize the logger!\nERROR: {}", e);
     }
 
     // Override with cmd args

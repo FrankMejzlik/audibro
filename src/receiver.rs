@@ -2,9 +2,10 @@
 //! The main module providing high-level API for the receiver of the data.
 //!
 
+use hashsig::common::MsgVerification;
 use hashsig::{Receiver, ReceiverParams, ReceiverTrait};
 use rodio::Decoder as RodioDecoder;
-use std::io::Write;
+use std::io::{stdout, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -52,7 +53,7 @@ impl AudiBroReceiver {
         AudiBroReceiver { params, receiver }
     }
 
-    pub fn run(&mut self, output: &mut dyn Write) {
+    pub fn run(&mut self) {
         let my_buffer = SlidingBuffer::new();
         let my_buffer_clone = my_buffer.clone();
 
@@ -97,10 +98,39 @@ impl AudiBroReceiver {
                 my_buffer_clone.append(&received_block.data);
                 println!("STATUS: {}", received_block.sender);
             } else {
-                output
-                    .write_all(&received_block.data)
-                    .expect("The output should be writable!");
-                output.flush().expect("Should be flushable!");
+                let mut handle = stdout().lock();
+
+                match &received_block.sender {
+                    MsgVerification::Verified(id) => {
+                        writeln!(
+                            handle,
+                            "{};verified;{};{}",
+                            received_block.metadata.seq,
+                            id.petnames.join(","),
+                            String::from_utf8_lossy(&received_block.data)
+                        )
+                        .unwrap();
+                    }
+                    MsgVerification::Certified(id) => {
+                        writeln!(
+                            handle,
+                            "{};certified;{};{}",
+                            received_block.metadata.seq,
+                            id.petnames.join(","),
+                            String::from_utf8_lossy(&received_block.data)
+                        )
+                        .unwrap();
+                    }
+                    MsgVerification::Unverified => {
+                        writeln!(
+                            handle,
+                            "{};unverified;;{}",
+                            received_block.metadata.seq,
+                            String::from_utf8_lossy(&received_block.data)
+                        )
+                        .unwrap();
+                    }
+                }
             }
             debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, String::from_utf8_lossy(&received_block.data));
         }
