@@ -68,6 +68,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         key_lifetime: args.key_lifetime,
         cert_interval: args.cert_interval,
         delivery_deadline: Duration::from_millis(args.delivery_deadline_ms),
+        tui: args.tui,
     };
     info!("Running a receiver with {recv_params:#?}");
 
