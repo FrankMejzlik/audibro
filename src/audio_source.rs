@@ -9,7 +9,7 @@ use minimp3::{Decoder, Frame};
 use std::io::{Cursor, Read};
 // ---
 #[allow(unused_imports)]
-use hashsig::{debug, error, info, log_input, trace, warn};
+use hab::{debug, error, info, log_input, trace, warn};
 
 #[derive(Debug)]
 pub struct AudioSourceData {

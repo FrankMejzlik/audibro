@@ -2,8 +2,8 @@
 //! The main module providing high-level API for the receiver of the data.
 //!
 
-use hashsig::common::MsgVerification;
-use hashsig::{Receiver, ReceiverParams, ReceiverTrait};
+use hab::common::MsgVerification;
+use hab::{Receiver, ReceiverParams, ReceiverTrait};
 use rodio::Decoder as RodioDecoder;
 use std::io::{stdout, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -13,7 +13,7 @@ use std::time::Duration;
 use sha2::{Digest, Sha256};
 // ---
 #[allow(unused_imports)]
-use hashsig::{debug, error, info, trace, warn};
+use hab::{debug, error, info, trace, warn};
 
 use crate::config::{self, BlockSignerInst};
 use crate::sliding_buffer::SlidingBuffer;
@@ -28,6 +28,7 @@ pub struct AudiBroReceiverParams {
     pub cert_interval: usize,
     pub delivery_deadline: Duration,
     pub tui: bool,
+    pub alt_input: Option<std::sync::mpsc::Receiver<Vec<u8>>>,
 }
 
 pub struct AudiBroReceiver {
@@ -45,10 +46,10 @@ impl AudiBroReceiver {
             id_filename: config::ID_FILENAME.into(),
             datagram_size: config::DATAGRAM_SIZE,
             net_buffer_size: config::BUFFER_SIZE,
-            pub_key_layer_limit: config::MAX_PKS,
             key_lifetime: params.key_lifetime,
             cert_interval: params.cert_interval,
             delivery_deadline: params.delivery_deadline,
+			alt_input: None,
         });
 
         AudiBroReceiver { params, receiver }

@@ -2,7 +2,6 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
-use rand::RngCore;
 use std::io::stdin;
 use std::io::BufRead;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -13,8 +12,8 @@ use std::sync::Arc;
 
 // ---
 #[allow(unused_imports)]
-use hashsig::{debug, error, info, log_input, trace, warn};
-use hashsig::{Sender, SenderParams, SenderTrait};
+use hab::{debug, error, info, log_input, trace, warn};
+use hab::{Sender, SenderParams, SenderTrait};
 // ---
 use crate::config::{self, BlockSignerInst};
 use crate::tui::TerminalUi;
@@ -44,7 +43,6 @@ impl AudiBroSender {
         let sender = Sender::new(SenderParams {
             addr: params.addr.clone(),
             running: params.running.clone(),
-            layers: params.layers,
             seed: params.seed,
             id_dir: config::ID_DIR.into(),
             id_filename: config::ID_FILENAME.into(),
@@ -55,6 +53,7 @@ impl AudiBroSender {
             cert_interval: params.cert_interval,
             max_piece_size: params.max_piece_size,
             key_dist: params.key_dist.clone(),
+            alt_output: None,
         });
         AudiBroSender { params, sender }
     }
@@ -93,6 +92,7 @@ impl AudiBroSender {
         #[cfg(feature = "simulate_stdin")]
         {
             use chrono::Local;
+            use rand::RngCore;
             use std::thread;
 
             let mut rng = rand::thread_rng();

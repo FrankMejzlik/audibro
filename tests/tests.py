@@ -16,8 +16,8 @@ ALICE_DIR = "env/sender_alice"
 BOB_DIR = "env/receiver_bob"
 ENV_DIRS = [ALICE_DIR, BOB_DIR]
 
-TYPE = "debug"
-#TYPE = "release"
+#TYPE = "debug"
+TYPE = "release"
 
 def spawn_sender(cwd):
     # Define the command to run, including any arguments
@@ -77,6 +77,7 @@ def test_scenarios(dir):
 
                         ps_alice.stdin.write(input)
                         ps_alice.stdin.flush()
+                        time.sleep(0.5)
                     else:
                         if ps_bob is None:
                             time.sleep(1)
@@ -86,6 +87,7 @@ def test_scenarios(dir):
 
                         ps_alice.stdin.write(input)
                         ps_alice.stdin.flush()
+                        time.sleep(0.5)
                         act_output = ps_bob.stdout.readline().decode()
                         assert act_output == exp_output, "Message mismatch!"
 

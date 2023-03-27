@@ -10,8 +10,8 @@ use clap::Parser;
 use rand_chacha::ChaCha20Rng;
 use sha3::{Sha3_256, Sha3_512};
 // ---
-use hashsig::utils;
-use hashsig::BlockSigner;
+use hab::utils;
+use hab::BlockSigner;
 // ---
 use crate::config;
 
@@ -34,8 +34,6 @@ pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
 //pub const DATAGRAM_SIZE: usize = 1500;
 pub const DATAGRAM_SIZE: usize = 2_usize.pow(16) / 2;
-/// A maximum number of keys per layer stored at the receiver.
-pub const MAX_PKS: usize = 3;
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",

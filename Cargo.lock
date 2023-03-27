@@ -63,7 +63,7 @@ dependencies = [
  "crossterm",
  "ctrlc",
  "fern",
- "hashsig",
+ "hab",
  "hex",
  "lazy_static",
  "log",
@@ -531,13 +531,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
-name = "hashbrown"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-
-[[package]]
-name = "hashsig"
+name = "hab"
 version = "0.1.0"
 dependencies = [
  "bincode",
@@ -564,6 +558,12 @@ dependencies = [
  "tungstenite",
  "xxhash-rust",
 ]
+
+[[package]]
+name = "hashbrown"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 
 [[package]]
 name = "heck"

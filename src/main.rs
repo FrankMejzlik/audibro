@@ -17,7 +17,7 @@ use std::time::Duration;
 // ---
 use clap::Parser;
 #[allow(unused_imports)]
-use hashsig::{debug, error, info, log_input, trace, warn};
+use hab::{debug, error, info, log_input, trace, warn};
 use serde::{Deserialize, Serialize};
 // ---
 use crate::config::{Args, ProgramMode};
@@ -52,6 +52,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         cert_interval: args.cert_interval,
         delivery_deadline: Duration::from_millis(args.delivery_deadline_ms),
         tui: args.tui,
+        alt_input: None,
     };
     info!("Running a receiver with {recv_params:#?}");
 

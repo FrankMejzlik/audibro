@@ -10,7 +10,7 @@ use crossterm::terminal::{self, disable_raw_mode, enable_raw_mode, Clear, ClearT
 use crossterm::{cursor, execute, queue, style};
 
 #[allow(unused_imports)]
-use hashsig::{debug, error, info, log_input, trace, warn};
+use hab::{debug, error, info, log_input, trace, warn};
 // ---
 use crate::audio_source::AudioSource;
 use crate::audio_source::AudioSourceData;
