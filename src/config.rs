@@ -32,8 +32,8 @@ pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 /// Size of the buffer used to receive UDP datagrams.
 pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
-//pub const DATAGRAM_SIZE: usize = 1500;
-pub const DATAGRAM_SIZE: usize = 2_usize.pow(16) / 2;
+pub const DATAGRAM_SIZE: usize = 28;
+//pub const DATAGRAM_SIZE: usize = 2_usize.pow(16) / 2;
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",

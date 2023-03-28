@@ -21,7 +21,7 @@ TYPE = "release"
 
 def spawn_sender(cwd):
     # Define the command to run, including any arguments
-    command = [f'../target/{TYPE}/audibro', '--seed=40', '--layers=3', '--key-lifetime=3', '--max-piece-size=10485760', '--config=../../../config.toml', 'sender', '0.0.0.0:5555', 'alice']
+    command = [f'../target/{TYPE}/audibro', '--seed=40', '--key-lifetime=3', '--max-piece-size=10485760', '--config=../../../config.toml', 'sender', '0.0.0.0:5555', 'alice']
     os.makedirs(cwd, exist_ok=True)
 
     # Start the subprocess and redirect stdin/stdout to pipes

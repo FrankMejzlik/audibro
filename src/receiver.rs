@@ -3,14 +3,13 @@
 //!
 
 use hab::common::MsgVerification;
-use hab::{Receiver, ReceiverParams, ReceiverTrait};
+use hab::{utils, Receiver, ReceiverParams, ReceiverTrait};
 use rodio::Decoder as RodioDecoder;
 use std::io::{stdout, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 // ---
-use sha2::{Digest, Sha256};
 // ---
 #[allow(unused_imports)]
 use hab::{debug, error, info, trace, warn};
@@ -49,7 +48,7 @@ impl AudiBroReceiver {
             key_lifetime: params.key_lifetime,
             cert_interval: params.cert_interval,
             delivery_deadline: params.delivery_deadline,
-			alt_input: None,
+            alt_input: None,
         });
 
         AudiBroReceiver { params, receiver }
@@ -102,10 +101,7 @@ impl AudiBroReceiver {
             } else {
                 let mut handle = stdout().lock();
 
-                let mut hasher = Sha256::new();
-                hasher.update(&received_block.data);
-                let result = hasher.finalize();
-                let hash = format!("{:x}", result);
+                let hash = utils::sha2_256_str(&received_block.data);
 
                 let size = received_block.data.len();
 
