@@ -10,6 +10,7 @@ authors = ["Frantisek Mejzlik <frankmejzlik@proton.me>"]
 #hab = {git = "ssh://git@github.com/FrankMejzlik/hab.git", branch = "master" }
 hab = { path = "../hab/", features = [
 	"log_input_output",
+	#"store_state",
 	#"simulate_out_of_order",
 	#"simulate_fake_msgs",
 ] }
