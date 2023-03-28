@@ -32,8 +32,8 @@ pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 /// Size of the buffer used to receive UDP datagrams.
 pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
-pub const DATAGRAM_SIZE: usize = 28;
-//pub const DATAGRAM_SIZE: usize = 2_usize.pow(16) / 2;
+//pub const DATAGRAM_SIZE: usize = 1500;
+pub const DATAGRAM_SIZE: usize = 2_usize.pow(16);
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",
@@ -61,7 +61,7 @@ cfg_if! {
     // *** PRODUCTION ***
     if #[cfg(not(feature = "debug"))] {
         /// Size of the hashes in a Merkle tree
-        const N: usize = 256 / 8;
+        const N: usize = 512 / 8;
         /// Number of SK segments in signature
         const K: usize = 32;
         /// Depth of the Merkle tree (without the root layer)
@@ -75,7 +75,7 @@ cfg_if! {
         // Hash fn for message hashing. msg: * -> N
         type MsgHashFn = Sha3_512;
         // Hash fn for tree & secret hashing. sk: 2N -> N & tree: N -> N
-        type TreeHashFn = Sha3_256;
+        type TreeHashFn = Sha3_512;
     }
     // *** DEBUG ***
     else {

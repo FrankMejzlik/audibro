@@ -110,7 +110,7 @@ impl AudiBroReceiver {
                         writeln!(
                             handle,
                             "{};verified;{};{};{}",
-                            received_block.metadata.seq,
+                            received_block.seq,
                             id.petnames.join(","),
                             size,
                             hash
@@ -121,7 +121,7 @@ impl AudiBroReceiver {
                         writeln!(
                             handle,
                             "{};certified;{};{};{}",
-                            received_block.metadata.seq,
+                            received_block.seq,
                             id.petnames.join(","),
                             size,
                             hash
@@ -132,13 +132,13 @@ impl AudiBroReceiver {
                         writeln!(
                             handle,
                             "{};unverified;;{};{}",
-                            received_block.metadata.seq, size, hash
+                            received_block.seq, size, hash
                         )
                         .unwrap();
                     }
                 }
             }
-            debug!(tag: "received", "[{}][{:?}] {}", received_block.metadata.seq, received_block.sender, &received_block.data.len());
+            debug!(tag: "received", "[{}][{:?}] {}", received_block.seq, received_block.sender, &received_block.data.len());
         }
     }
 }

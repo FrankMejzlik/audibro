@@ -45,6 +45,6 @@ rodio = "0.17"
 toml = "0.7"
 
 [features]
-default = ["debug"]
+default = []
 debug = []
 simulate_stdin = []
