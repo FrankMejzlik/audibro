@@ -8,7 +8,6 @@ use std::time::Duration;
 use cfg_if::cfg_if;
 use clap::Parser;
 use rand_chacha::ChaCha20Rng;
-use sha3::Sha3_512;
 // ---
 use hab::utils;
 use hab::BlockSigner;
@@ -33,7 +32,7 @@ pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
 pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
 //pub const DATAGRAM_SIZE: usize = 1500;
-pub const DATAGRAM_SIZE: usize = 2_usize.pow(16);
+pub const DATAGRAM_SIZE: usize = 65507;
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",
@@ -60,6 +59,8 @@ pub const SIM_INPUT_PERIOD: Option<Duration> = None;
 cfg_if! {
     // *** PRODUCTION ***
     if #[cfg(not(feature = "debug"))] {
+        use sha3::Sha3_512;
+
         /// Size of the hashes in a Merkle tree
         const N: usize = 512 / 8;
         /// Number of SK segments in signature
@@ -84,7 +85,7 @@ cfg_if! {
         /// Size of the hashes in a Merkle tree
         const N: usize = 256 / 8;
         /// Number of SK segments in signature
-        const K: usize = 8;
+        const K: usize = 64;
         /// Depth of the Merkle tree (without the root layer)
         const TAU: usize = 4;
 
@@ -94,7 +95,7 @@ cfg_if! {
 
         // --- Hash functions ---
         // Hash fn for message hashing. msg: * -> N
-        type MsgHashFn = Sha3_512;
+        type MsgHashFn = Sha3_256;
         // Hash fn for tree & secret hashing. sk: 2N -> N & tree: N -> N
         type TreeHashFn = Sha3_256;
     }
