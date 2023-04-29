@@ -28,8 +28,6 @@ pub const OUTPUT_DBG_DIR: &str = "logs/output/";
 
 /// How long we will keep the subscriber alive without receiving another heartbeat.
 pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
-/// Size of the buffer used to receive UDP datagrams.
-pub const BUFFER_SIZE: usize = 2 * DATAGRAM_SIZE;
 /// Size of the datagram we send over the UDP prorocol.
 //pub const DATAGRAM_SIZE: usize = 1500;
 pub const DATAGRAM_SIZE: usize = 65507;
@@ -170,6 +168,9 @@ pub struct Args {
     pub max_piece_size: usize,
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
+	/// If set, the receiver will also re-distribute the messages.
+	#[clap(long)]
+    pub distribute: Option<String>,
 }
 
 ///

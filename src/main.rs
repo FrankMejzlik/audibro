@@ -52,6 +52,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         cert_interval: args.cert_interval,
         delivery_deadline: Duration::from_millis(args.delivery_deadline_ms),
         tui: args.tui,
+		distribute: args.distribute,
         alt_input: None,
     };
     info!("Running a receiver with {recv_params:#?}");

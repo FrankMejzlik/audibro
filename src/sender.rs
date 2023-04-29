@@ -41,16 +41,14 @@ pub struct AudiBroSender {
 impl AudiBroSender {
     pub fn new(params: AudiBroSenderParams) -> Self {
         let sender = Sender::new(SenderParams {
-            addr: params.addr.clone(),
+            sender_addr: params.addr.clone(),
             running: params.running.clone(),
             seed: params.seed,
-            id_dir: config::ID_DIR.into(),
-            id_filename: config::ID_FILENAME.into(),
+            id_filename: format!("{}/{}", config::ID_DIR, config::ID_FILENAME),
             datagram_size: config::DATAGRAM_SIZE,
-            net_buffer_size: config::BUFFER_SIZE,
-            subscriber_lifetime: config::SUBSCRIBER_LIFETIME,
+            receiver_lifetime: config::SUBSCRIBER_LIFETIME,
             key_lifetime: params.key_lifetime,
-            cert_interval: params.cert_interval,
+            pre_cert: params.cert_interval,
             max_piece_size: params.max_piece_size,
             key_dist: params.key_dist.clone(),
             alt_output: None,

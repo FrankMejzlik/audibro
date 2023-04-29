@@ -2,7 +2,7 @@
 //! The main module providing high-level API for the receiver of the data.
 //!
 
-use hab::common::MsgVerification;
+use hab::common::MessageAuthentication;
 use hab::{utils, Receiver, ReceiverParams, ReceiverTrait};
 use rodio::Decoder as RodioDecoder;
 use std::io::{stdout, Write};
@@ -26,6 +26,7 @@ pub struct AudiBroReceiverParams {
     pub key_lifetime: usize,
     pub cert_interval: usize,
     pub delivery_deadline: Duration,
+	pub distribute: Option<String>,
     pub tui: bool,
     pub alt_input: Option<std::sync::mpsc::Receiver<Vec<u8>>>,
 }
@@ -41,13 +42,9 @@ impl AudiBroReceiver {
             running: params.running.clone(),
             target_addr: params.target_addr.clone(),
             target_name: params.target_name.clone(),
-            id_dir: config::ID_DIR.into(),
-            id_filename: config::ID_FILENAME.into(),
-            datagram_size: config::DATAGRAM_SIZE,
-            net_buffer_size: config::BUFFER_SIZE,
-            key_lifetime: params.key_lifetime,
-            cert_interval: params.cert_interval,
-            delivery_deadline: params.delivery_deadline,
+            id_filename: format!("{}{}", config::ID_DIR, config::ID_FILENAME),
+			distribute: params.distribute.clone(),
+            delivery_delay: params.delivery_deadline,
             alt_input: None,
         });
 
@@ -96,17 +93,17 @@ impl AudiBroReceiver {
 
             // OUTPUT
             if self.params.tui {
-                my_buffer_clone.append(&received_block.data);
-                println!("STATUS: {}", received_block.sender);
+                my_buffer_clone.append(&received_block.message);
+                println!("STATUS: {}", received_block.authentication);
             } else {
                 let mut handle = stdout().lock();
 
-                let hash = utils::sha2_256_str(&received_block.data);
+                let hash = utils::sha2_256_str(&received_block.message);
 
-                let size = received_block.data.len();
+                let size = received_block.message.len();
 
-                match &received_block.sender {
-                    MsgVerification::Verified(id) => {
+                match &received_block.authentication {
+                    MessageAuthentication::Authenticated(id) => {
                         writeln!(
                             handle,
                             "{};verified;{};{};{}",
@@ -117,7 +114,7 @@ impl AudiBroReceiver {
                         )
                         .unwrap();
                     }
-                    MsgVerification::Certified(id) => {
+                    MessageAuthentication::Certified(id) => {
                         writeln!(
                             handle,
                             "{};certified;{};{};{}",
@@ -128,7 +125,7 @@ impl AudiBroReceiver {
                         )
                         .unwrap();
                     }
-                    MsgVerification::Unverified => {
+                    MessageAuthentication::Unverified => {
                         writeln!(
                             handle,
                             "{};unverified;;{};{}",
@@ -138,7 +135,7 @@ impl AudiBroReceiver {
                     }
                 }
             }
-            debug!(tag: "received", "[{}][{:?}] {}", received_block.seq, received_block.sender, &received_block.data.len());
+            debug!(tag: "received", "[{}][{:?}] {}", received_block.seq, received_block.authentication, &received_block.message.len());
         }
     }
 }
