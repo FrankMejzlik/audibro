@@ -9,8 +9,7 @@ use cfg_if::cfg_if;
 use clap::Parser;
 use rand_chacha::ChaCha20Rng;
 // ---
-use hab::utils;
-use hab::BlockSigner;
+use hab::{utils, HorstSigScheme};
 // ---
 use crate::config;
 
@@ -70,10 +69,7 @@ cfg_if! {
         /// A seedable CSPRNG used for number generation
         type CsPrng = ChaCha20Rng;
 
-        // --- Hash functions ---
-        // Hash fn for message hashing. msg: * -> N
-        type MsgHashFn = Sha3_512;
-        // Hash fn for tree & secret hashing. sk: 2N -> N & tree: N -> N
+        // --- Hash function ---
         type TreeHashFn = Sha3_512;
     }
     // *** DEBUG ***
@@ -92,30 +88,14 @@ cfg_if! {
         type CsPrng = ChaCha20Rng;
 
         // --- Hash functions ---
-        // Hash fn for message hashing. msg: * -> N
-        type MsgHashFn = Sha3_256;
-        // Hash fn for tree & secret hashing. sk: 2N -> N & tree: N -> N
-        type TreeHashFn = Sha3_256;
+        type HashFn = Sha3_256;
     }
 }
 
 // ---
 const T: usize = 2_usize.pow(TAU as u32);
-const MSG_HASH_SIZE: usize = (K * TAU) / 8;
-const TREE_HASH_SIZE: usize = N;
 
-// Alias for the specific signer/verifier we'll be using.
-pub type BlockSignerInst = BlockSigner<
-    K,
-    TAU,
-    { TAU + 1 },
-    T,
-    MSG_HASH_SIZE,
-    TREE_HASH_SIZE,
-    CsPrng,
-    MsgHashFn,
-    TreeHashFn,
->;
+pub type SignerInst = HorstSigScheme<N, K, TAU, { TAU + 1 }, T, CsPrng, HashFn>;
 
 // ***
 // The clap config for command line arguments.
@@ -168,8 +148,8 @@ pub struct Args {
     pub max_piece_size: usize,
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
-	/// If set, the receiver will also re-distribute the messages.
-	#[clap(long)]
+    /// If set, the receiver will also re-distribute the messages.
+    #[clap(long)]
     pub distribute: Option<String>,
 }
 

@@ -15,7 +15,7 @@ use std::sync::Arc;
 use hab::{debug, error, info, log_input, trace, warn};
 use hab::{Sender, SenderParams, SenderTrait};
 // ---
-use crate::config::{self, BlockSignerInst};
+use crate::config::{self, SignerInst};
 use crate::tui::TerminalUi;
 
 #[derive(Debug)]
@@ -35,7 +35,7 @@ pub struct AudiBroSenderParams {
 
 pub struct AudiBroSender {
     params: AudiBroSenderParams,
-    sender: Sender<BlockSignerInst>,
+    sender: Sender<SignerInst>,
 }
 
 impl AudiBroSender {

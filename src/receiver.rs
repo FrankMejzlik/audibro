@@ -14,7 +14,7 @@ use std::time::Duration;
 #[allow(unused_imports)]
 use hab::{debug, error, info, trace, warn};
 
-use crate::config::{self, BlockSignerInst};
+use crate::config::{self, SignerInst};
 use crate::sliding_buffer::SlidingBuffer;
 
 #[derive(Debug)]
@@ -33,7 +33,7 @@ pub struct AudiBroReceiverParams {
 
 pub struct AudiBroReceiver {
     params: AudiBroReceiverParams,
-    receiver: Receiver<BlockSignerInst>,
+    receiver: Receiver<SignerInst>,
 }
 
 impl AudiBroReceiver {
