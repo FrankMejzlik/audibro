@@ -33,8 +33,9 @@ pub struct AudiBroSenderParams {
     pub id_filepath: String,
     pub dgram_size: usize,
     pub receiver_lifetime: Duration,
-    pub tui: bool,
     pub key_dist: Vec<Vec<usize>>,
+    pub dgram_delay: Duration,
+    pub tui: bool,
 }
 
 pub struct AudiBroSender {
@@ -55,6 +56,7 @@ impl AudiBroSender {
             max_piece_size: params.max_piece_size,
             key_dist: params.key_dist.clone(),
             key_charges: params.key_charges,
+            dgram_delay: params.dgram_delay,
             alt_output: None,
         });
         AudiBroSender { params, sender }

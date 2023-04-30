@@ -155,6 +155,9 @@ pub struct Args {
     /// A filepath to identity file.
     #[clap(short, long, default_value = ".identity/id.bin")]
     pub id_filepath: String,
+    /// Time before sending two consecutive datagrams.
+    #[clap(long, default_value_t = 50)]
+    pub dgram_delay_us: u64,
     /// A filepath to config file.
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,

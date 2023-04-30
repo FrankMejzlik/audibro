@@ -36,8 +36,9 @@ fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
         id_filepath: args.id_filepath,
         dgram_size: args.dgram_size,
         receiver_lifetime: Duration::from_secs(args.receiver_lifetime_s),
-        tui: args.tui,
         key_dist: file_config.key_dist,
+        dgram_delay: Duration::from_millis(args.dgram_delay_us),
+        tui: args.tui,
     };
     info!("Running a sender with {sender_params:#?}");
 
