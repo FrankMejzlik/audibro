@@ -14,7 +14,7 @@ use std::time::Duration;
 #[allow(unused_imports)]
 use hab::{debug, error, info, trace, warn};
 
-use crate::config::{self, SignerInst};
+use crate::config::SignerInst;
 use crate::sliding_buffer::SlidingBuffer;
 
 #[derive(Debug)]
@@ -25,6 +25,8 @@ pub struct AudiBroReceiverParams {
     pub delivery_deadline: Duration,
     pub distribute: Option<String>,
     pub heartbeat_period: Duration,
+    pub frag_timeout: Duration,
+    pub id_filepath: String,
     pub tui: bool,
     pub alt_input: Option<std::sync::mpsc::Receiver<Vec<u8>>>,
 }
@@ -40,10 +42,11 @@ impl AudiBroReceiver {
             running: params.running.clone(),
             target_addr: params.target_addr.clone(),
             target_name: params.target_name.clone(),
-            id_filename: format!("{}{}", config::ID_DIR, config::ID_FILENAME),
+            id_filename: params.id_filepath.clone(),
             distribute: params.distribute.clone(),
             heartbeat_period: params.heartbeat_period,
             delivery_delay: params.delivery_deadline,
+            frag_timeout: params.frag_timeout,
             alt_input: None,
         });
 

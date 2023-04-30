@@ -33,6 +33,9 @@ fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
         key_charges: args.key_charges,
         cert_interval: args.cert_interval,
         max_piece_size: args.max_piece_size,
+        id_filepath: args.id_filepath,
+        dgram_size: args.dgram_size,
+        receiver_lifetime: Duration::from_secs(args.receiver_lifetime_s),
         tui: args.tui,
         key_dist: file_config.key_dist,
     };
@@ -50,6 +53,8 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         target_name: args.target_name,
         delivery_deadline: Duration::from_millis(args.delivery_deadline_ms),
         heartbeat_period: Duration::from_secs(args.heartbeat_period_s),
+        frag_timeout: Duration::from_secs(args.frag_timeout_s),
+        id_filepath: args.id_filepath,
         tui: args.tui,
         distribute: args.distribute,
         alt_input: None,

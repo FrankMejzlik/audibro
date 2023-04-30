@@ -2,8 +2,6 @@
 //! General static config file where you can tune the desired protocol paramters.
 //!
 
-use std::time::Duration;
-
 // ---
 use cfg_if::cfg_if;
 use clap::Parser;
@@ -13,11 +11,6 @@ use hab::{utils, HorstSigScheme};
 // ---
 use crate::config;
 
-/// A directory where the identity files lie (e.g. `BlockSigner` with secret & public keys).
-pub const ID_DIR: &str = ".identity/";
-/// A name of the file where the state of `BlockSigner` is serialized.
-pub const ID_FILENAME: &str = "id.bin";
-
 /// A directory where we store the logs by default (e.g. when you run `cargo run`)
 pub const LOGS_DIR: &str = "logs/";
 /// A directory for output of signed blocks that the SENDER boradcasts.
@@ -25,11 +18,6 @@ pub const INPUT_DBG_DIR: &str = "logs/input/";
 /// A directory for output of signed blocks that the RECEIVER receives.
 pub const OUTPUT_DBG_DIR: &str = "logs/output/";
 
-/// How long we will keep the subscriber alive without receiving another heartbeat.
-pub const SUBSCRIBER_LIFETIME: Duration = Duration::from_secs(10);
-/// Size of the datagram we send over the UDP prorocol.
-//pub const DATAGRAM_SIZE: usize = 1500;
-pub const DATAGRAM_SIZE: usize = 65507;
 /// List of logging tags that we use throuought the program.
 pub const USED_LOG_TAGS: &[&str] = &[
     "output",
@@ -69,8 +57,8 @@ cfg_if! {
         /// A seedable CSPRNG used for number generation
         type CsPrng = ChaCha20Rng;
 
-		/// Maximum number of secure signature per one key
-		const KEY_CHARGES: usize = 24;
+        /// Maximum number of secure signature per one key
+        const KEY_CHARGES: usize = 24;
 
         // --- Hash function ---
         type TreeHashFn = Sha3_512;
@@ -86,8 +74,8 @@ cfg_if! {
         /// Depth of the Merkle tree (without the root layer)
         const TAU: usize = 4;
 
-		/// Maximum number of secure signature per one key
-		const KEY_CHARGES: usize = 1;
+        /// Maximum number of secure signature per one key
+        const KEY_CHARGES: usize = 1;
 
         // --- Random generators ---
         /// A seedable CSPRNG used for number generation
@@ -146,14 +134,28 @@ pub struct Args {
     /// A number of signatures one keypair can generate.
     #[clap(long)]
     pub key_charges: Option<usize>,
+    /// Period at which the heartbeat to the sender is sent.
     #[clap(long, default_value_t = 5)]
     pub heartbeat_period_s: u64,
+    #[clap(long, default_value_t = 10)]
+    /// A timeout before unfinished pieces are discarded.
+    pub frag_timeout_s: u64,
     /// Maximum delay between delivery of messages (in milliseconds)
     #[clap(long, default_value_t = 100)]
     pub delivery_deadline_ms: u64,
     /// Maximum size of one piece to be broadcasted.
     #[clap(long, default_value_t = 1024*1024)]
     pub max_piece_size: usize,
+    /// A maximum size of datagram to be sent over UDP.
+    #[clap(long, default_value_t = 1500/*65507*/)]
+    pub dgram_size: usize,
+    /// Time for which a subscriber is considered alive.
+    #[clap(long, default_value_t = 10)]
+    pub receiver_lifetime_s: u64,
+    /// A filepath to identity file.
+    #[clap(short, long, default_value = ".identity/id.bin")]
+    pub id_filepath: String,
+    /// A filepath to config file.
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
     /// If set, the receiver will also re-distribute the messages.

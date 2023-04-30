@@ -7,6 +7,7 @@ use std::io::BufRead;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{channel, Receiver as MpscReceiver};
 use std::sync::Arc;
+use std::time::Duration;
 
 // ---
 
@@ -15,7 +16,7 @@ use std::sync::Arc;
 use hab::{debug, error, info, log_input, trace, warn};
 use hab::{Sender, SenderParams, SenderTrait};
 // ---
-use crate::config::{self, SignerInst};
+use crate::config::SignerInst;
 use crate::tui::TerminalUi;
 
 #[derive(Debug)]
@@ -29,6 +30,9 @@ pub struct AudiBroSenderParams {
     pub key_charges: Option<usize>,
     pub cert_interval: usize,
     pub max_piece_size: usize,
+    pub id_filepath: String,
+    pub dgram_size: usize,
+    pub receiver_lifetime: Duration,
     pub tui: bool,
     pub key_dist: Vec<Vec<usize>>,
 }
@@ -44,9 +48,9 @@ impl AudiBroSender {
             sender_addr: params.addr.clone(),
             running: params.running.clone(),
             seed: params.seed,
-            id_filename: format!("{}/{}", config::ID_DIR, config::ID_FILENAME),
-            datagram_size: config::DATAGRAM_SIZE,
-            receiver_lifetime: config::SUBSCRIBER_LIFETIME,
+            id_filename: params.id_filepath.clone(),
+            datagram_size: params.dgram_size,
+            receiver_lifetime: params.receiver_lifetime,
             pre_cert: params.cert_interval,
             max_piece_size: params.max_piece_size,
             key_dist: params.key_dist.clone(),
