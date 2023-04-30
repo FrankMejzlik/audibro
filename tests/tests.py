@@ -89,6 +89,7 @@ def test_scenarios(dir):
                         ps_alice.stdin.flush()
                         time.sleep(0.5)
                         act_output = ps_bob.stdout.readline().decode()
+                        #print(f"{act_output}")
                         assert act_output == exp_output, "Message mismatch!"
 
                     seq += 1
