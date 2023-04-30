@@ -30,7 +30,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
         seed: args.seed,
         layers: args.layers,
         addr: args.addr,
-        key_lifetime: args.key_lifetime,
+        key_charges: args.key_charges,
         cert_interval: args.cert_interval,
         max_piece_size: args.max_piece_size,
         tui: args.tui,

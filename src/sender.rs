@@ -26,7 +26,7 @@ pub struct AudiBroSenderParams {
     /// An address where the sender will listen for heartbeats.
     pub addr: String,
     /// A number of signatures one keypair can generate.
-    pub key_lifetime: usize,
+    pub key_charges: Option<usize>,
     pub cert_interval: usize,
     pub max_piece_size: usize,
     pub tui: bool,
@@ -47,10 +47,10 @@ impl AudiBroSender {
             id_filename: format!("{}/{}", config::ID_DIR, config::ID_FILENAME),
             datagram_size: config::DATAGRAM_SIZE,
             receiver_lifetime: config::SUBSCRIBER_LIFETIME,
-            key_lifetime: params.key_lifetime,
             pre_cert: params.cert_interval,
             max_piece_size: params.max_piece_size,
             key_dist: params.key_dist.clone(),
+            key_charges: params.key_charges,
             alt_output: None,
         });
         AudiBroSender { params, sender }

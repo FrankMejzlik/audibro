@@ -11,7 +11,7 @@ authors = ["Frantisek Mejzlik <frankmejzlik@proton.me>"]
 hab = { path = "../hab/", features = [
 	#"print_times", 
 	"log_input_output",
-	#"store_state",
+	"store_state",
 	#"simulate_out_of_order",
 	#"simulate_fake_msgs",
 ] }

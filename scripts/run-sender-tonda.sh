@@ -7,4 +7,4 @@ fi
 echo "Running sender as $BUILD_TYPE..."
 
 cd env/sender/
-../../target/${BUILD_TYPE}/audibro --seed=40 --key-lifetime=3 --max-piece-size=10485760 sender "0.0.0.0:6555" tonda
+../../target/${BUILD_TYPE}/audibro --seed=40 --key-charges=3 --max-piece-size=10485760 sender "0.0.0.0:6555" tonda

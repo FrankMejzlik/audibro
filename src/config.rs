@@ -69,6 +69,9 @@ cfg_if! {
         /// A seedable CSPRNG used for number generation
         type CsPrng = ChaCha20Rng;
 
+		/// Maximum number of secure signature per one key
+		const KEY_CHARGES: usize = 24;
+
         // --- Hash function ---
         type TreeHashFn = Sha3_512;
     }
@@ -83,6 +86,9 @@ cfg_if! {
         /// Depth of the Merkle tree (without the root layer)
         const TAU: usize = 4;
 
+		/// Maximum number of secure signature per one key
+		const KEY_CHARGES: usize = 1;
+
         // --- Random generators ---
         /// A seedable CSPRNG used for number generation
         type CsPrng = ChaCha20Rng;
@@ -95,7 +101,7 @@ cfg_if! {
 // ---
 const T: usize = 2_usize.pow(TAU as u32);
 
-pub type SignerInst = HorstSigScheme<N, K, TAU, { TAU + 1 }, T, CsPrng, HashFn>;
+pub type SignerInst = HorstSigScheme<N, K, TAU, { TAU + 1 }, T, KEY_CHARGES, CsPrng, HashFn>;
 
 // ***
 // The clap config for command line arguments.
@@ -138,8 +144,8 @@ pub struct Args {
     #[clap(long, default_value_t = 1)]
     pub cert_interval: usize,
     /// A number of signatures one keypair can generate.
-    #[clap(long, default_value_t = 20)]
-    pub key_lifetime: usize,
+    #[clap(long)]
+    pub key_charges: Option<usize>,
     #[clap(long, default_value_t = 5)]
     pub heartbeat_period_s: u64,
     /// Maximum delay between delivery of messages (in milliseconds)
