@@ -7,9 +7,11 @@ stages:
 build:
   stage: build
   script:
-    - cargo build --verbose
+    - cargo build
 
 test:
   stage: test
   script:
-    - cargo test --verbose
+    - cargo build
+    - cd tests
+    - python3 test.py
