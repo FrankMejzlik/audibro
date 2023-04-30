@@ -140,6 +140,8 @@ pub struct Args {
     /// A number of signatures one keypair can generate.
     #[clap(long, default_value_t = 20)]
     pub key_lifetime: usize,
+    #[clap(long, default_value_t = 5)]
+    pub heartbeat_period_s: u64,
     /// Maximum delay between delivery of messages (in milliseconds)
     #[clap(long, default_value_t = 100)]
     pub delivery_deadline_ms: u64,

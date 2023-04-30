@@ -22,11 +22,9 @@ pub struct AudiBroReceiverParams {
     pub running: Arc<AtomicBool>,
     pub target_addr: String,
     pub target_name: String,
-    /// A number of signatures one keypair can generate.
-    pub key_lifetime: usize,
-    pub cert_interval: usize,
     pub delivery_deadline: Duration,
-	pub distribute: Option<String>,
+    pub distribute: Option<String>,
+    pub heartbeat_period: Duration,
     pub tui: bool,
     pub alt_input: Option<std::sync::mpsc::Receiver<Vec<u8>>>,
 }
@@ -43,7 +41,8 @@ impl AudiBroReceiver {
             target_addr: params.target_addr.clone(),
             target_name: params.target_name.clone(),
             id_filename: format!("{}{}", config::ID_DIR, config::ID_FILENAME),
-			distribute: params.distribute.clone(),
+            distribute: params.distribute.clone(),
+            heartbeat_period: params.heartbeat_period,
             delivery_delay: params.delivery_deadline,
             alt_input: None,
         });
