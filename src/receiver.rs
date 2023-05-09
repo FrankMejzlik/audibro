@@ -27,6 +27,9 @@ pub struct AudiBroReceiverParams {
     pub heartbeat_period: Duration,
     pub frag_timeout: Duration,
     pub id_filepath: String,
+    pub dgram_delay: Duration,
+    pub receiver_lifetime: Duration,
+    pub deliver: bool,
     pub tui: bool,
     pub alt_input: Option<std::sync::mpsc::Receiver<Vec<u8>>>,
 }
@@ -47,6 +50,9 @@ impl AudiBroReceiver {
             heartbeat_period: params.heartbeat_period,
             delivery_delay: params.delivery_deadline,
             frag_timeout: params.frag_timeout,
+            dgram_delay: params.dgram_delay,
+            receiver_lifetime: params.receiver_lifetime,
+            deliver: params.deliver,
             alt_input: None,
         });
 
@@ -71,8 +77,8 @@ impl AudiBroReceiver {
                     Ok(x) => x,
 
                     Err(_) => {
-                        println!("Waiting for data!");
-                        std::thread::sleep(Duration::from_millis(1000));
+                        //println!("Waiting for data!");
+                        std::thread::sleep(Duration::from_millis(100));
                         continue;
                     }
                 };

@@ -6,5 +6,5 @@ if [ "$1" = "release" ]; then
 fi
 echo "Running TUI sender as $BUILD_TYPE..."
 
-cd env/sender/
-../../target/${BUILD_TYPE}/audibro --seed=42 --key-charges=3 --tui sender "0.0.0.0:6555" tonda
+cd env/sender-alice/
+../../target/${BUILD_TYPE}/audibro --seed=42 --key-charges=3 --tui sender "0.0.0.0:6555" alice

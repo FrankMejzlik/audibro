@@ -6,5 +6,5 @@ if [ "$1" = "release" ]; then
 fi
 echo "Running sender as $BUILD_TYPE..."
 
-cd env/sender2/
-../../target/${BUILD_TYPE}/audibro --seed=42 --layers=3 --key-charges=3 sender "0.0.0.0:5556" lojza
+cd env/sender-bob/
+../../target/${BUILD_TYPE}/audibro --seed=42 --layers=3 --key-charges=3 sender "0.0.0.0:5556" bob

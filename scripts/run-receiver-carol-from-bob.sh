@@ -6,5 +6,5 @@ if [ "$1" = "release" ]; then
 fi
 echo "Running receiver as $BUILD_TYPE..."
 
-cd env/receiver2/
-../../target/$BUILD_TYPE/audibro receiver "127.0.0.1:5555" lojza
+cd env/receiver-carol/
+../../target/$BUILD_TYPE/audibro receiver "127.0.0.1:5556" alice

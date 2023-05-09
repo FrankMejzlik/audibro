@@ -96,14 +96,9 @@ impl AudiBroSender {
         #[cfg(feature = "simulate_stdin")]
         {
             use chrono::Local;
-            use rand::RngCore;
             use std::thread;
 
-            let mut rng = rand::thread_rng();
-            let mut buffer = vec![0u8; 512 * 1024 * 1024]; // 5 MiB buffer
-            rng.fill_bytes(&mut buffer);
-
-            if let Some(x) = config::SIM_INPUT_PERIOD {
+            if let Some(x) = crate::config::SIM_INPUT_PERIOD {
                 // We simulate periodic data coming via input
                 thread::sleep(x);
             } else {
@@ -114,7 +109,6 @@ impl AudiBroSender {
 
             let msg = Local::now().format("%d-%m-%Y %H:%M:%S").to_string();
             input_bytes = msg.into_bytes();
-            input_bytes = buffer
         }
 
         #[cfg(not(feature = "simulate_stdin"))]

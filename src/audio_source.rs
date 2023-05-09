@@ -1,7 +1,8 @@
+use rodio::Decoder as RodioDecoder;
 use std::{
     fs::File,
     sync::mpsc::{Receiver as MpscReceiver, Sender as MpscSender},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 // ---
@@ -72,6 +73,8 @@ impl AudioSource {
                                 // Update the current position in the input data.
                                 let current_position = decoder.reader().position() as usize;
 
+                                //warn!("channels: {channels}, sample_rate: {sample_rate}");
+
                                 // Calculate frame duration based on frame samples
                                 let frame_duration =
                                     data.len() as f64 / (sample_rate * channels as i32) as f64;
@@ -82,7 +85,7 @@ impl AudioSource {
                                         // Calculate the raw frame data.
                                         let raw_frame_data =
                                             &file_data_clone[frame_start..current_position];
-                                        // println!(
+                                        // 	warn!(
                                         // 	"Frame [{frame_start}, {current_position}) with size {} to duration {}.",
                                         // 	raw_frame_data.len(),
                                         // 	current_duration
@@ -90,6 +93,25 @@ impl AudioSource {
 
                                         frame_start = current_position;
                                         prev_duration = current_duration;
+
+                                        // let start_time = Instant::now();
+                                        // let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
+                                        // let sink = rodio::Sink::try_new(&handle).unwrap();
+
+                                        // let source = match RodioDecoder::new(Cursor::new(raw_frame_data.to_vec())) {
+                                        // 	Ok(x) => x,
+
+                                        // 	Err(_) => {
+                                        // 		println!("Waiting for data!");
+                                        // 		//std::thread::sleep(Duration::from_millis(1000));
+                                        // 		continue;
+                                        // 	}
+                                        // };
+
+                                        // sink.append(source);
+                                        // sink.sleep_until_end();
+                                        // let duration = start_time.elapsed();
+                                        // warn!("Time elapsed in expensive_function() is: {:?}", duration);
 
                                         // Sleep for the interval duration to simulate processing.
                                         std::thread::sleep(Duration::from_secs_f64(

@@ -36,7 +36,7 @@ pub const USED_LOG_TAGS: &[&str] = &[
 /// A period in which the simulated STDIN input will be procuded.
 #[cfg(feature = "simulate_stdin")]
 //pub const SIM_INPUT_PERIOD: Option<Duration> = Some(Duration::from_millis(10));
-pub const SIM_INPUT_PERIOD: Option<Duration> = None;
+pub const SIM_INPUT_PERIOD: Option<std::time::Duration> = None;
 
 // ***************************************
 //             PARAMETERS
@@ -158,6 +158,9 @@ pub struct Args {
     /// Time before sending two consecutive datagrams.
     #[clap(long, default_value_t = 50)]
     pub dgram_delay_us: u64,
+    /// If receiver should deliver the pieces.
+    #[clap(long, default_value_t = true)]
+    pub deliver: bool,
     /// A filepath to config file.
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
