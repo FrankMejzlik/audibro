@@ -27,7 +27,7 @@ impl TerminalUi {
             audio_src_tx: tx,
         }
     }
-    pub fn run_tui(&self, audio_options: &Vec<AudioFile>) {
+    pub fn run_tui(&self, audio_options: &[AudioFile]) {
         let mut audio_menu = vec![];
         let mut audio_files = vec![];
 
@@ -44,12 +44,11 @@ impl TerminalUi {
             .flatten()
             .collect::<Vec<String>>();
         let menu_items_data_flat = menu_items_data
-            .clone()
             .into_iter()
             .flatten()
             .collect::<Vec<String>>();
 
-        let mut selected_item = 0;
+        let mut selected_item:usize = 0;
         let mut active_item = None;
 
         let mut changed = true;
@@ -100,9 +99,7 @@ impl TerminalUi {
             if let Some(x) = Self::read_action() {
                 match x {
                     KeyCode::Up => {
-                        if selected_item > 0 {
-                            selected_item -= 1;
-                        }
+                        selected_item = selected_item.saturating_sub(1);
                     }
                     KeyCode::Down => {
                         if selected_item < menu_items_flat.len() - 1 {

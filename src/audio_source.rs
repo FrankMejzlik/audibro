@@ -10,7 +10,7 @@ use cpal::{
     Device, SupportedStreamConfig,
 };
 use minimp3::{Decoder, Frame};
-use mp3lame_encoder::{Builder, FlushNoGap, InterleavedPcm};
+use mp3lame_encoder::{Builder, FlushNoGap, InterleavedPcm, Encoder};
 use std::io::{Cursor, Read};
 use std::{
     fmt::Debug,
@@ -61,7 +61,7 @@ impl AudioSource {
         info!("Default input format: {:?}", config);
         let data_tx_clone = data_tx.clone();
 
-        let (txx, rxx) = mpsc::channel();
+        let (txx, rxx) = mpsc::channel::<Vec<f64>>();
         // Spawn a new thread
         std::thread::spawn(move || {
             let num_channels = config_clone.channels();
@@ -101,11 +101,9 @@ impl AudioSource {
                             &data_tx,
                         );
                     }
-                } else {
-                    if let Ok(audio_data) = rx.recv() {
-                        currently_playing = Some(audio_data);
-                        warn!("Switching to '{currently_playing:?}'...");
-                    }
+                } else if let Ok(audio_data) = rx.recv() {
+                    currently_playing = Some(audio_data);
+                    warn!("Switching to '{currently_playing:?}'...");
                 }
                 std::thread::sleep(Duration::from_millis(100));
             }
@@ -125,7 +123,7 @@ fn stream_mic(
 ) {
     match config.sample_format() {
         cpal::SampleFormat::F64 => run::<f64>(
-            &device,
+            device,
             config,
             rx,
             currently_playing,
@@ -134,31 +132,31 @@ fn stream_mic(
             |x| x,
         ),
         cpal::SampleFormat::F32 => run::<f32>(
-            &device,
+            device,
             config,
             rx,
             currently_playing,
             buffer_interval,
             txx,
-            |x| f32_to_f64(x),
+            f32_to_f64,
         ),
         cpal::SampleFormat::I16 => run::<i16>(
-            &device,
+            device,
             config,
             rx,
             currently_playing,
             buffer_interval,
             txx,
-            |x| i16_to_f64(x),
+            i16_to_f64,
         ),
         cpal::SampleFormat::U16 => run::<u16>(
-            &device,
+            device,
             config,
             rx,
             currently_playing,
             buffer_interval,
             txx,
-            |x| u16_to_f64(x),
+            u16_to_f64,
         ),
         _ => panic!("Unsupported sample format"),
     };
@@ -208,26 +206,23 @@ fn stream_mp3(
                 let frame_duration = data.len() as f64 / (sample_rate * channels as i32) as f64;
 
                 current_duration += frame_duration;
-                if current_position > prepos {
-                    if current_duration >= prev_duration + buffer_interval {
-                        // Calculate the raw frame data.
-                        let raw_frame_data = &file_data_clone[frame_start..current_position];
-                        // 	warn!(
-                        // 	"Frame [{frame_start}, {current_position}) with size {} to duration {}.",
-                        // 	raw_frame_data.len(),
-                        // 	current_duration
-                        // );
+                if current_position > prepos && current_duration >= prev_duration + buffer_interval
+                {
+                    // Calculate the raw frame data.
+                    let raw_frame_data = &file_data_clone[frame_start..current_position];
+                    // 	warn!(
+                    // 	"Frame [{frame_start}, {current_position}) with size {} to duration {}.",
+                    // 	raw_frame_data.len(),
+                    // 	current_duration
+                    // );
 
-                        frame_start = current_position;
-                        let interval_played = current_duration - prev_duration;
-                        prev_duration = current_duration;
+                    frame_start = current_position;
+                    let interval_played = current_duration - prev_duration;
+                    prev_duration = current_duration;
 
-                        // Sleep for the interval duration to simulate processing.
-                        std::thread::sleep(Duration::from_secs_f64(interval_played));
-
-                        //my_buffer_clone.append(raw_frame_data);
-                        data_tx.send(raw_frame_data.to_vec()).expect("!");
-                    }
+                    // Sleep for the interval duration to simulate processing.
+                    std::thread::sleep(Duration::from_secs_f64(interval_played));
+                    data_tx.send(raw_frame_data.to_vec()).expect("!");
                 }
             }
             Err(minimp3::Error::Eof) => {
@@ -242,7 +237,7 @@ fn stream_mp3(
 }
 
 fn encode_waveform_f64(
-    wave_buffer: &Vec<f64>,
+    wave_buffer: &[f64],
     num_channels: u16,
     mp3_encoder: &mut mp3lame_encoder::Encoder,
 ) -> Vec<u8> {
@@ -268,7 +263,7 @@ fn encode_waveform_f64(
     mp3_out_buffer
 }
 
-fn build_mp3_encoder(num_channels: u16, sample_rate: u32) -> mp3lame_encoder::Encoder {
+fn build_mp3_encoder(num_channels: u16, sample_rate: u32) -> Encoder {
     let mut mp3_encoder = Builder::new().expect("Create LAME builder");
     mp3_encoder
         .set_num_channels(num_channels as u8)
@@ -282,8 +277,8 @@ fn build_mp3_encoder(num_channels: u16, sample_rate: u32) -> mp3lame_encoder::En
     mp3_encoder
         .set_quality(mp3lame_encoder::Quality::Best)
         .expect("set quality");
-    let mp3_encoder = mp3_encoder.build().expect("To initialize LAME encoder");
-    mp3_encoder
+    mp3_encoder.build().expect("To initialize LAME encoder")
+    
 }
 
 fn run<T>(
