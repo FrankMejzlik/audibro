@@ -65,11 +65,12 @@ impl AudiBroReceiver {
 
         if self.params.tui {
             println!("Receiving the audio broadcast...");
-            std::thread::spawn(move || loop {
-                let buffer_to_play = my_buffer.clone();
+            std::thread::spawn(move || {
+				let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
+				let sink = rodio::Sink::try_new(&handle).unwrap();
+				loop {
+					let buffer_to_play = my_buffer.clone();
 
-                let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
-                let sink = rodio::Sink::try_new(&handle).unwrap();
 
                 let source = match RodioDecoder::new(buffer_to_play) {
                     Ok(x) => x,
@@ -82,7 +83,8 @@ impl AudiBroReceiver {
 
                 sink.append(source);
                 sink.sleep_until_end();
-            });
+            }}
+		);
         }
 
         // The main loop as long as the app should run

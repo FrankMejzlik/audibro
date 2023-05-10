@@ -20,11 +20,26 @@ sudo apt install libasound2-dev
 
 ## **Compile**
 
+### Native
+
+If you want to run the application in your system directly.
+
 ```sh
 # A debug build
 cargo build
 # A release build
 cargo build --release
+```
+
+### Using Docker
+
+If you don't want to alter your host system, just use Docker.
+
+```sh
+# Build the image
+sudo docker build -t audibro .
+# Create a network for the containers
+sudo docker network create audinet
 ```
 
 ## **Running**
@@ -37,6 +52,8 @@ Each of the actors will run in separate environment directory inside `env` --- i
 
 To run the setup, execute each of the following commands in your prepared terminal windows.
 
+### Native
+
 ```sh
 # An original sender Alice (broadcasting on the port 5000)
 bash ./scripts/run-tui-sender-alice.sh
@@ -44,6 +61,18 @@ bash ./scripts/run-tui-sender-alice.sh
 bash ./scripts/run-tui-receiver-bob-from-alice.sh
 # A receiver Carol
 bash ./scripts/run-tui-receiver-carol-from-bob.sh
+```
+
+### Docker
+
+```sh
+# An original sender Alice (broadcasting on the port 5000)
+sudo docker run --rm --name alice --network audinet --device /dev/snd:/dev/snd -p5000:5000 -it audibro bash ./scripts/run-tui-sender-alice.sh
+# A receiver and distributor Bob (broadcasting on the port 5001)
+# The Alice container must be running when launching Bob's --- The IP address of the container must be known
+sudo docker run --rm --name bob --network audinet --device /dev/snd:/dev/snd -p5001:5001 -it audibro bash ./scripts/run-tui-receiver-bob-from-alice-docker.sh `sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' alice`
+# A receiver Carol
+# Unfortunately I was unable to attach twice to the same mapped output device from two different containers
 ```
 
 Having done that, you should see a UI in the sender terminal.
