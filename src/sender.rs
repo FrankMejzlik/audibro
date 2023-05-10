@@ -2,19 +2,23 @@
 //! The main module providing high-level API for the sender of the data.
 //!
 
+use std::fs;
 use std::io::stdin;
 use std::io::BufRead;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{channel, Receiver as MpscReceiver};
 use std::sync::Arc;
 use std::time::Duration;
 
 // ---
-
+use id3::Tag;
 // ---
 #[allow(unused_imports)]
 use hab::{debug, error, info, log_input, trace, warn};
 use hab::{Sender, SenderParams, SenderTrait};
+use id3::TagLike;
+use crate::audio_source::AudioFile;
 // ---
 use crate::config::SignerInst;
 use crate::tui::TerminalUi;
@@ -36,6 +40,8 @@ pub struct AudiBroSenderParams {
     pub key_dist: Vec<Vec<usize>>,
     pub dgram_delay: Duration,
     pub tui: bool,
+	/// A directory where MP3 files for broadcaster are located.
+	pub data_dir: String,
 }
 
 pub struct AudiBroSender {
@@ -64,11 +70,16 @@ impl AudiBroSender {
 
     pub fn run(&mut self) {
         let (tx, mut rx) = channel();
+		let data_dir = self.params.data_dir.clone();
 
+		// If should run with TUI
         if self.params.tui {
             std::thread::spawn(move || {
+				// Prepare MP3 files for broadcasting
+				let audio_files = get_audio_files(&data_dir);
+				// Run the UI
                 let tui = TerminalUi::new(tx);
-                tui.run_tui();
+                tui.run_tui(&audio_files);
             });
         }
 
@@ -83,9 +94,13 @@ impl AudiBroSender {
                 Self::read_input()
             };
 
+			let now = std::time::Instant::now();
             if let Err(e) = self.sender.broadcast(data) {
                 warn!("Failed to broadcast! ERROR: {e}");
             }
+			// Compute time elapsed since `now`
+			let elapsed = now.elapsed();
+			warn!("Time elapsed: {:?}", elapsed);
         }
     }
     // ---
@@ -135,4 +150,37 @@ impl AudiBroSender {
 
         input_bytes
     }
+}
+
+fn get_audio_files(data_dir: &str) -> Vec<AudioFile> {
+	let mut audio_files = vec![];
+    let path = PathBuf::from(data_dir);
+
+    for entry in fs::read_dir(path).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if let Some(ext) = path.extension() {
+            if ext == "mp3" {
+                let tag = Tag::read_from_path(path.clone()).unwrap();
+                let artist = tag.artist().unwrap_or("Unknown Artist").to_owned();
+                let title = tag.title().unwrap_or("Unknown Title").to_owned();
+				warn!("Artist: {}, Title: {}", artist, title);
+                let bitrate = 0;
+
+                let file = AudioFile {
+                    artist,
+                    title,
+                    filepath: path.to_str().unwrap().to_owned(),
+                    bitrate,
+                };
+
+                audio_files.push(file);
+            }
+        }
+    }
+
+	warn!("Loaded files: {:#?}", audio_files);
+
+    audio_files
 }

@@ -1,8 +1,7 @@
-use rodio::Decoder as RodioDecoder;
 use std::{
     fs::File,
     sync::mpsc::{Receiver as MpscReceiver, Sender as MpscSender},
-    time::{Duration, Instant},
+    time::Duration,
 };
 
 // ---
@@ -11,6 +10,15 @@ use std::io::{Cursor, Read};
 // ---
 #[allow(unused_imports)]
 use hab::{debug, error, info, log_input, trace, warn};
+
+/// Represents an MP3 file that can be broadcasted.
+#[derive(Debug)]
+pub struct AudioFile {
+	pub artist: String,
+	pub title: String,
+	pub filepath: String,
+	pub bitrate: u16
+}
 
 #[derive(Debug)]
 pub struct AudioSourceData {

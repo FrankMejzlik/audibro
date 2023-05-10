@@ -6,5 +6,6 @@ if [ "$1" = "release" ]; then
 fi
 echo "Running receiver as $BUILD_TYPE..."
 
+mkdir -p env/receiver-bob/
 cd env/receiver-bob/
-../../target/$BUILD_TYPE/audibro receiver --tui "127.0.0.1:6555" alice
+../../target/$BUILD_TYPE/audibro receiver --tui --distribute="127.0.0.1:5001" "127.0.0.1:5000" alice

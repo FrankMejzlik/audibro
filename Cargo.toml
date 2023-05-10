@@ -44,6 +44,7 @@ crossterm = "0.26"
 minimp3 = "0.5"
 rodio = "0.17"
 toml = "0.7"
+id3 = "1.7"
 
 [features]
 default = ["debug"]

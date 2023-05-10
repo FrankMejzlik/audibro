@@ -1,10 +1,14 @@
-# audibro
+# AudiBro
 
-A toolkit for broadcasting or receiving authenticated data stream using a protocol built upon hash-based few-time signatures (e.g. HORST, PORST, SPHINCS).
+> This software is a part of the Master thesis of *Frantisek Mejzlik* titled **Fast hash-based signing protocol for message stream authentication**.
 
-Current implementation uses the HORST signature scheme. This scheme is vulnarable against "weak words" attack and against adaptive attacks. Therefore we will also add an option to use PORST with SPHINCS-like extension to mitigate those vulnerabilites.
+**Audi**o **Bro**adcaster is an example application for real-time audio broadcasting. It demonstrates the usage of the [HAB crate](https://gitlab.mff.cuni.cz/mejzlikf/hab) for post-quantum data stream authentication based on hash-based signatures in a real-world scenario.
 
-It's important to note that the protocol itself is agnostic to few-time signature scheme used.
+## **Prerequisites**
+
+* **Operating system**: The crate **should** work fine on common modern Linux distributions, Windows NT systems and MacOS. Though, it was explicitly tested with Debian 11 and Windows 10/11.
+* [**Rust compiler**](https://www.rust-lang.org/learn/get-started): Version 1.58 or higher.
+* **Dependencies**: Not all used third-party crates may be written in pure Rust and may depend on some libraries (standard shared object libraries) that must be installed in the system. These are usually easy to install using the system package manager (`apt`, `yum`, ...). If so, the compiler will let you know what library is missing.
 
 ## **Compile**
 
@@ -13,113 +17,59 @@ It's important to note that the protocol itself is agnostic to few-time signatur
 cargo build
 # A release build
 cargo build --release
-# Run unit tests
-cargo test
 ```
 
 ## **Running**
 
-Run sender & receiver in different terminal windows. These scripts run the sender & receiver inside the `env` directory (and in the `sender` & `receiver` subdirectories).
+ It is recommended to have three terminal windows where you can run a sender (Alice), a receiver + distributor (Bob) and a receiver (Carol). In the `scripts` directory, there are convenience scripts that will get your radio setup running in no time. Feel free to inspect and play with the different arguments by inspecting those scripts.
+
+Each of the actors will run in separate environment directory inside `env` --- i.e. `sender-alice`, `receiver-bob` and `receiver-carol`. The broadcast topology would look like this:
+
+![Demo sender/distributor/receiver topology](docs/img/audibro-seup.png)
+
+To run the setup, execute each of the following commands in your prepared terminal windows.
 
 ```sh
-./scripts/run-sender.sh
-./scripts/run-receiver.sh
+# An original sender Alice (broadcasting on the port 5000)
+./scripts/run-tui-sender-alice.sh
+# A receiver and distributor Bob (broadcasting on the port 5001)
+./scripts/run-tui-receiver-bob-from-alice.sh
+# A receiver Carol
+./scripts/run-tui-receiver-carol-from-bob.sh
 ```
 
-### Permanent identities (state of the receiver & sender)
+Having done that, you should see a UI in the sender terminal. 
 
-Both sender & receiver modes store their state to `.identity` directory in the directory from which the binary is run. At the moment those are not encrypted (TODO using ~/.ssh/ keys) and the state writes are not fault-tolerant (TODO using speculative write & atomic `mv`).
+![AudiBro TUI](docs/img/audibro-tui-playing.png)
 
-```sh
-./scripts/clear-ids.sh
-```
+Navigate through options using the arrow keys and start streaming the selected MP3 file or input from your default input device by hitting ENTER. You can change the input as you wish by selecting a different input. The receivers should start receiving messages with the audio data and play that to you via your default audio output device. In their terminal windows, you can monitor the authentication status of the received messages — i.e. if you are listening to authenticated data or not
 
-### Running without a network via files only
+## **Advanced usage**
 
-You use `sender` mode to sign the message from file and make it output it back to some file.
-Then you can verify the output with `receiver` mode and, if the signature is valid, output the original message to the file.
-
-```sh
-# Sign the message in `./env/data.input` and store the signed block to `./env/data.signed`
-./target/debug/audibro sender "0.0.0.0:5555" --input ./env/data.input --output ./env/data.signed
-
-# Verify the signed block  in `./env/data.signed` and if valid write it to `./env/data.output`
-./target/debug/audibro receiver "127.0.0.1:5555" --input ./env/data.signed --output ./env/data.output
-```
+This example also offers other modes of operation; for example, the non-TUI mode, where you can send ASCII messages by typing them into the STDIN of a sender process and hitting ENTER. In case you want to know more, please refer to [this page](docs/ADVANCED.md).
 
 ## **Logging**
 
-For sake of readability we are using a "tagged" output to different files which you can monitor in real time (e.g. using `tail -f`). This effectively emulates a multiple terminals. Feel free to open multiple terminal (or use e.g. `tmux` to split into panes) and monitor whatever you're interested in.
+To monitor the AudiBro application, a special logging mechanism is categorized into different log files that can be monitored in real-time. To read more about that, please head to [this page](docs/LOGGING.md).
 
-### `tmux` one-liners
+## **Documentation**
 
-```sh
-# TODO: write a tmux one-liner that splits the panes for you and runs the belowmentioned commands to live monitor the logs
-```
-
-### Sender Alice
-
-#### **Supported logs:**
+The user documentation is available in the appendix of the thesis. The developer documentation can be generated and displayed by running the following command. The documentation will be built and shown in your default browser.
 
 ```sh
-# General log
-tail -f ./env/sender-alice/logs/output.log
-# ---
-# The main sender loop
-tail -f ./env/sender-alice/logs/sender.log
-# The UTF-8 repre of broadcasted messages
-tail -f ./env/sender-alice/logs/broadcasted.log
-# The state of key layers
-tail -f ./env/sender-alice/logs/block_signer.log
-# ---
-# The task managing the requests from receivers
-tail -f ./env/sender-alice/logs/registrator_task.log
-# The list of active subscribers
-tail -f ./env/sender-alice/logs/subscribers.log
+cargo doc --open
 ```
 
-### Receiver Bob
+## **Known limitations**
 
-#### **Supported logs**
+Since this is only an example application, it is not production ready; it is merely an example of how to use the HAB crate. Know limitations are listed [HERE](docs/LIMITATIONS.md).
 
-```sh
-# General log
-tail -f ./env/receiver-bob/logs/output.log
-# ---
-# The main sender loop
-tail -f ./env/receiver-bob/logs/receiver.log
-# The UTF-8 repre of valid received messages
-tail -f ./env/receiver-bob/logs/received.log
-# The state of the public keys in the keystore
-tail -f ./env/receiver-bob/logs/block_verifier.log
-tail -f ./env/receiver-bob/logs/delivery_queues.log
-# ---
-# The task sending periodic heartbeats to the sender
-tail -f ./env/receiver-bob/logs/heartbeat_task.log
-# The inner state of fragmented block receiver
-tail -f ./env/receiver-bob/logs/fragmented_blocks.log
-tail -f ./env/receiver-bob/logs/subscribers.log
-tail -f ./env/receiver-bob/logs/registrator_task.log
-```
+## **License**
 
-### Receiver Carol
+Copyright © 2023 Frantisek Mejzlik <frankmejzlik@proton.me>
 
-#### **Supported logs**
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-```sh
-# General log
-tail -f ./env/receiver-carol/logs/output.log
-# ---
-# The main sender loop
-tail -f ./env/receiver-carol/logs/receiver.log
-# The UTF-8 repre of valid received messages
-tail -f ./env/receiver-carol/logs/received.log
-# The state of the public keys in the keystore
-tail -f ./env/receiver-carol/logs/block_verifier.log
-tail -f ./env/receiver-carol/logs/delivery_queues.log
-# ---
-# The task sending periodic heartbeats to the sender
-tail -f ./env/receiver-carol/logs/heartbeat_task.log
-# The inner state of fragmented block receiver
-tail -f ./env/receiver-carol/logs/fragmented_blocks.log
-```
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

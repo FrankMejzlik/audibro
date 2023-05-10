@@ -12,8 +12,7 @@ use crossterm::{cursor, execute, queue, style};
 #[allow(unused_imports)]
 use hab::{debug, error, info, log_input, trace, warn};
 // ---
-use crate::audio_source::AudioSource;
-use crate::audio_source::AudioSourceData;
+use crate::audio_source::{AudioSourceData, AudioSource, AudioFile};
 
 pub struct TerminalUi {
     _audio_src: AudioSource,
@@ -28,35 +27,35 @@ impl TerminalUi {
             audio_src_tx: tx,
         }
     }
-    pub fn run_tui(&self) {
+    pub fn run_tui(&self, audio_options: &Vec<AudioFile>) {
+		let mut audio_menu = vec![];
+		let mut audio_files = vec![];
+
+		for audio_file in audio_options.iter() {
+			audio_menu.push(format!("{} - {}", audio_file.artist, audio_file.title));
+			audio_files.push(audio_file.filepath.clone());
+		}
+
         let menu_items = vec![
-            vec![
-                "Disturbed - Inside the fire",
-                "Slipknot - Snuff",
-                "Bullet For My Valentine - Hand of Blood",
-            ],
-            vec!["MICROPHONE"],
-            vec!["QUIT"],
+            audio_menu,
+            vec!["MICROPHONE".into()],
+            vec!["QUIT".into()],
         ];
         let menu_items_data = vec![
-            vec![
-                "data/disturbed_inside-the-fire.mp3",
-                "data/slipknot_snuff.mp3",
-                "data/bullet-for-my-valentine_hand-of-blood.mp3",
-            ],
-            vec![""],
-            vec!["QUIT"],
+            audio_files,
+            vec!["".into()],
+            vec!["QUIT".into()],
         ];
         let menu_items_flat = menu_items
             .clone()
             .into_iter()
             .flatten()
-            .collect::<Vec<&str>>();
+            .collect::<Vec<String>>();
         let menu_items_data_flat = menu_items_data
             .clone()
             .into_iter()
             .flatten()
-            .collect::<Vec<&str>>();
+            .collect::<Vec<String>>();
 
         let mut selected_item = 0;
         let mut active_item = None;
@@ -119,7 +118,7 @@ impl TerminalUi {
                         }
                     }
                     KeyCode::Enter => {
-                        self.process_menu_item(menu_items_data_flat[selected_item]);
+                        self.process_menu_item(&menu_items_data_flat[selected_item]);
                         active_item = Some(selected_item);
                     }
                     KeyCode::Char('q') => break,
@@ -137,6 +136,7 @@ impl TerminalUi {
         )
         .unwrap();
         disable_raw_mode().unwrap();
+		self.process_menu_item("QUIT");
     }
 
     fn process_menu_item(&self, item: &str) {

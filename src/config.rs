@@ -58,7 +58,7 @@ cfg_if! {
         type CsPrng = ChaCha20Rng;
 
         /// Maximum number of secure signature per one key
-        const KEY_CHARGES: usize = 24;
+        const KEY_CHARGES: usize = 20;
 
         // --- Hash function ---
         type TreeHashFn = Sha3_512;
@@ -75,7 +75,7 @@ cfg_if! {
         const TAU: usize = 4;
 
         /// Maximum number of secure signature per one key
-        const KEY_CHARGES: usize = 1;
+        const KEY_CHARGES: usize = 20;
 
         // --- Random generators ---
         /// A seedable CSPRNG used for number generation
@@ -164,6 +164,9 @@ pub struct Args {
     /// A filepath to config file.
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
+	/// A directory with MP3 files.
+    #[clap(short, long, default_value = "../../data/")]
+    pub data_dir: String,
     /// If set, the receiver will also re-distribute the messages.
     #[clap(long)]
     pub distribute: Option<String>,
