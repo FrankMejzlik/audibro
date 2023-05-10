@@ -8,7 +8,15 @@
 
 * **Operating system**: The crate **should** work fine on common modern Linux distributions, Windows NT systems and MacOS. Though, it was explicitly tested with Debian 11 and Windows 10/11.
 * [**Rust compiler**](https://www.rust-lang.org/learn/get-started): Version 1.58 or higher.
-* **Dependencies**: Not all used third-party crates may be written in pure Rust and may depend on some libraries (standard shared object libraries) that must be installed in the system. These are usually easy to install using the system package manager (`apt`, `yum`, ...). If so, the compiler will let you know what library is missing.
+* **Dependencies**:
+  * On Linux, [`alsa`](https://wiki.debian.org/ALSA) lib is required; for example, on Debian it is installed with the package `libasound2`
+
+```sh
+sudo apt update
+sudo apt libasound2-dev
+ ```
+
+> Not all other used third-party crates may be written in pure Rust and may depend on some libraries (standard shared object libraries) that must be installed in the system. These are usually easy to install using the system package manager (`apt`, `yum`, ...). If so, the compiler will let you know what library is missing.
 
 ## **Compile**
 
@@ -38,7 +46,7 @@ To run the setup, execute each of the following commands in your prepared termin
 ./scripts/run-tui-receiver-carol-from-bob.sh
 ```
 
-Having done that, you should see a UI in the sender terminal. 
+Having done that, you should see a UI in the sender terminal.
 
 ![AudiBro TUI](docs/img/audibro-tui-playing.png)
 
