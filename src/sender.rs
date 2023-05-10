@@ -83,6 +83,7 @@ impl AudiBroSender {
             });
         }
 
+        let mut prev = std::time::Instant::now();
         // The main loop as long as the app should run
         while self.params.running.load(Ordering::Acquire) {
             // Get the data to broadcast from TUI mode
@@ -94,13 +95,12 @@ impl AudiBroSender {
                 Self::read_input()
             };
 
-            let now = std::time::Instant::now();
             if let Err(e) = self.sender.broadcast(data) {
                 warn!("Failed to broadcast! ERROR: {e}");
             }
-            // Compute time elapsed since `now`
-            let elapsed = now.elapsed();
-            warn!("Time elapsed: {:?}", elapsed);
+            let now = std::time::Instant::now();
+            warn!("TIME: {}ms", (now - prev).as_millis());
+            prev = now;
         }
     }
     // ---

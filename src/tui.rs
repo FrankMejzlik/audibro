@@ -37,7 +37,7 @@ impl TerminalUi {
         }
 
         let menu_items = vec![audio_menu, vec!["MICROPHONE".into()], vec!["QUIT".into()]];
-        let menu_items_data = vec![audio_files, vec!["".into()], vec!["QUIT".into()]];
+        let menu_items_data = vec![audio_files, vec!["MICROPHONE".into()], vec!["QUIT".into()]];
         let menu_items_flat = menu_items
             .clone()
             .into_iter()

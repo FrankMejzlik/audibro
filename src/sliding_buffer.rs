@@ -21,6 +21,7 @@ impl SlidingBuffer {
         let mut buffer = self.buffer.lock().unwrap();
         buffer.extend_from_slice(data);
     }
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         let buffer = self.buffer.lock().unwrap();
         buffer.len()

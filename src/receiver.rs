@@ -66,26 +66,22 @@ impl AudiBroReceiver {
         if self.params.tui {
             println!("Receiving the audio broadcast...");
             std::thread::spawn(move || loop {
-                if my_buffer.len() < 100_000 {
-                    std::thread::sleep(Duration::from_millis(100));
-                    continue;
-                }
+                let buffer_to_play = my_buffer.clone();
+
                 let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
                 let sink = rodio::Sink::try_new(&handle).unwrap();
 
-                let source = match RodioDecoder::new(my_buffer.clone()) {
+                let source = match RodioDecoder::new(buffer_to_play) {
                     Ok(x) => x,
-
                     Err(_) => {
-                        //println!("Waiting for data!");
-                        std::thread::sleep(Duration::from_millis(100));
+                        println!("Buffering...");
+                        std::thread::sleep(Duration::from_millis(500));
                         continue;
                     }
                 };
 
                 sink.append(source);
                 sink.sleep_until_end();
-                std::thread::sleep(Duration::from_millis(100));
             });
         }
 
@@ -102,6 +98,7 @@ impl AudiBroReceiver {
             // OUTPUT
             if self.params.tui {
                 my_buffer_clone.append(&received_block.message);
+
                 println!("STATUS: {}", received_block.authentication);
             } else {
                 let mut handle = stdout().lock();
