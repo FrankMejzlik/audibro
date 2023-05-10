@@ -24,4 +24,4 @@ test_integration:
   stage: test
   script:
     - cargo build --release
-    - python tests/tests.py
+    - python3 tests/tests.py

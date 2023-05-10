@@ -24,24 +24,24 @@ BOB_DIR = f"{script_dir}/env/receiver_bob"
 ENV_DIRS = [ALICE_DIR, BOB_DIR]
 
 def spawn_sender(cwd):
-	os.chdir(script_dir)
-	# Define the command to run, including any arguments
-	command = [f'../target/{TYPE}/audibro', '--seed=40', '--key-charges=3', '--max-piece-size=10485760', '--config=../../../config.toml', 'sender', '0.0.0.0:5555', 'alice']
 	os.makedirs(cwd, exist_ok=True)
+	os.chdir(cwd)
+	# Define the command to run, including any arguments
+	command = [f'../../../target/{TYPE}/audibro', '--seed=40', '--key-charges=3', '--max-piece-size=10485760', '--config=../../../config.toml', 'sender', '0.0.0.0:5555', 'alice']
 
 	# Start the subprocess and redirect stdin/stdout to pipes
 	process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	return process
 
 def spawn_receiver(cwd):
-	os.chdir(script_dir)
-	# Define the command to run, including any arguments
-	command = [f'../target/{TYPE}/audibro', '--config=../../../config.toml',  'receiver', '127.0.0.1:5555', 'alice']
-
 	os.makedirs(cwd, exist_ok=True)
+	os.chdir(cwd)
+	# Define the command to run, including any arguments
+	command = [f'../../../target/{TYPE}/audibro', '--config=../../../config.toml',  'receiver', '127.0.0.1:5555', 'alice']
+
 
 	# Start the subprocess and redirect stdin/stdout to pipes
-	process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+	process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	return process
 
 
