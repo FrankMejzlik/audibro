@@ -64,7 +64,7 @@ impl TerminalUi {
                     terminal::Clear(ClearType::All),
                     cursor::Hide,
                     cursor::MoveTo(1, 1),
-                    style::Print("Choose broadcast input:\n-------------------------"),
+                    style::Print("Choose broadcast input:\n\r-------------------------"),
                     cursor::MoveToNextLine(1)
                 )
                 .unwrap();
