@@ -13,7 +13,7 @@
 
 ```sh
 sudo apt update
-sudo apt libasound2-dev
+sudo apt install libasound2-dev
  ```
 
 > Not all other used third-party crates may be written in pure Rust and may depend on some libraries (standard shared object libraries) that must be installed in the system. These are usually easy to install using the system package manager (`apt`, `yum`, ...). If so, the compiler will let you know what library is missing.
