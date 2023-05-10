@@ -14,8 +14,11 @@ build:
     - cargo build
 
 test:
-  stage: test
+  stage: unit
   script:
-    - cargo build
-    - cd tests
-    - python3 test.py
+    - cargo test
+
+  stage: integration
+  script:
+    - cargo build --release
+    - python tests/tests.py
