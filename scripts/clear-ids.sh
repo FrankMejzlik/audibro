@@ -7,7 +7,6 @@ fi
 echo "Clearing identities..."
 
 cd env/
-rm ./sender/.identity/*
-rm ./sender2/.identity/*
-rm ./receiver/.identity/*
-rm ./receiver2/.identity/*
+rm ./sender-alice/.identity/*
+rm ./receiver-bob/.identity/*
+rm ./receiver-carol/.identity/*
