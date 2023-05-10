@@ -60,6 +60,17 @@ This example also offers other modes of operation; for example, the non-TUI mode
 
 To monitor the AudiBro application, a special logging mechanism is categorized into different log files that can be monitored in real-time. To read more about that, please head to [this page](docs/LOGGING.md).
 
+## **Tests**
+
+To run the integration tests, you must have Python 3 with some packages installed. Just run these:
+
+```sh
+pip install -r tests/requirements.txt
+# Build the application in release mode and make sure that feature "debug" is on in the `Cargo.toml` file
+cargo build --release
+python tests/tests.py
+```
+
 ## **Documentation**
 
 The user documentation is available in the appendix of the thesis. The developer documentation can be generated and displayed by running the following command. The documentation will be built and shown in your default browser.
