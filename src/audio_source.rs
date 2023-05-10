@@ -14,10 +14,10 @@ use hab::{debug, error, info, log_input, trace, warn};
 /// Represents an MP3 file that can be broadcasted.
 #[derive(Debug)]
 pub struct AudioFile {
-	pub artist: String,
-	pub title: String,
-	pub filepath: String,
-	pub bitrate: u16
+    pub artist: String,
+    pub title: String,
+    pub filepath: String,
+    pub bitrate: u16,
 }
 
 #[derive(Debug)]

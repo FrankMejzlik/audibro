@@ -164,7 +164,7 @@ pub struct Args {
     /// A filepath to config file.
     #[clap(short, long, default_value = "../../config.toml")]
     pub config: String,
-	/// A directory with MP3 files.
+    /// A directory with MP3 files.
     #[clap(short, long, default_value = "../../data/")]
     pub data_dir: String,
     /// If set, the receiver will also re-distribute the messages.

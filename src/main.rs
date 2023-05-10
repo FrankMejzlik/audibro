@@ -39,7 +39,7 @@ fn run_sender(args: Args, running: Arc<AtomicBool>, file_config: FileConfig) {
         key_dist: file_config.key_dist,
         dgram_delay: Duration::from_micros(args.dgram_delay_us),
         tui: args.tui,
-		data_dir: args.data_dir,
+        data_dir: args.data_dir,
     };
     info!("Running a sender with {sender_params:#?}");
 
@@ -59,7 +59,7 @@ fn run_receiver(args: Args, running: Arc<AtomicBool>) {
         id_filepath: args.id_filepath,
         receiver_lifetime: Duration::from_secs(args.receiver_lifetime_s),
         deliver: args.deliver,
-		dgram_delay: Duration::from_micros(args.dgram_delay_us),
+        dgram_delay: Duration::from_micros(args.dgram_delay_us),
         tui: args.tui,
         distribute: args.distribute,
         alt_input: None,

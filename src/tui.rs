@@ -12,7 +12,7 @@ use crossterm::{cursor, execute, queue, style};
 #[allow(unused_imports)]
 use hab::{debug, error, info, log_input, trace, warn};
 // ---
-use crate::audio_source::{AudioSourceData, AudioSource, AudioFile};
+use crate::audio_source::{AudioFile, AudioSource, AudioSourceData};
 
 pub struct TerminalUi {
     _audio_src: AudioSource,
@@ -28,24 +28,16 @@ impl TerminalUi {
         }
     }
     pub fn run_tui(&self, audio_options: &Vec<AudioFile>) {
-		let mut audio_menu = vec![];
-		let mut audio_files = vec![];
+        let mut audio_menu = vec![];
+        let mut audio_files = vec![];
 
-		for audio_file in audio_options.iter() {
-			audio_menu.push(format!("{} - {}", audio_file.artist, audio_file.title));
-			audio_files.push(audio_file.filepath.clone());
-		}
+        for audio_file in audio_options.iter() {
+            audio_menu.push(format!("{} - {}", audio_file.artist, audio_file.title));
+            audio_files.push(audio_file.filepath.clone());
+        }
 
-        let menu_items = vec![
-            audio_menu,
-            vec!["MICROPHONE".into()],
-            vec!["QUIT".into()],
-        ];
-        let menu_items_data = vec![
-            audio_files,
-            vec!["".into()],
-            vec!["QUIT".into()],
-        ];
+        let menu_items = vec![audio_menu, vec!["MICROPHONE".into()], vec!["QUIT".into()]];
+        let menu_items_data = vec![audio_files, vec!["".into()], vec!["QUIT".into()]];
         let menu_items_flat = menu_items
             .clone()
             .into_iter()
@@ -136,7 +128,7 @@ impl TerminalUi {
         )
         .unwrap();
         disable_raw_mode().unwrap();
-		self.process_menu_item("QUIT");
+        self.process_menu_item("QUIT");
     }
 
     fn process_menu_item(&self, item: &str) {

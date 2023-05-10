@@ -60,9 +60,6 @@ dependencies = [
 name = "audibro"
 version = "0.1.0"
 dependencies = [
- "bincode",
- "bitreader",
- "byteorder",
  "cfg-if",
  "chrono",
  "clap",
@@ -70,24 +67,14 @@ dependencies = [
  "ctrlc",
  "fern",
  "hab",
- "hex",
  "id3",
- "lazy_static",
  "log",
  "minimp3",
- "rand",
  "rand_chacha",
- "rand_core",
  "rodio",
  "serde",
- "serde-big-array",
- "sha2",
  "sha3",
- "slice-of-array",
- "tokio",
  "toml",
- "tungstenite",
- "xxhash-rust",
 ]
 
 [[package]]
