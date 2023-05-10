@@ -13,12 +13,13 @@ build:
   script:
     - cargo build
 
-test:
-  stage: unit
+test_unit:
+  stage: test
   script:
     - cargo test
 
-  stage: integration
+test_integration:
+  stage: test
   script:
     - cargo build --release
     - python tests/tests.py
