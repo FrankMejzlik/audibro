@@ -65,10 +65,10 @@ To monitor the AudiBro application, a special logging mechanism is categorized i
 To run the integration tests, you must have Python 3 with some packages installed. Just run these:
 
 ```sh
-pip install -r tests/requirements.txt
+pip3 install -r tests/requirements.txt
 # Build the application in release mode and make sure that feature "debug" is on in the `Cargo.toml` file
 cargo build --release
-python tests/tests.py
+python3 tests/tests.py
 ```
 
 ## **Documentation**
