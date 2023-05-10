@@ -39,11 +39,11 @@ To run the setup, execute each of the following commands in your prepared termin
 
 ```sh
 # An original sender Alice (broadcasting on the port 5000)
-./scripts/run-tui-sender-alice.sh
+bash ./scripts/run-tui-sender-alice.sh
 # A receiver and distributor Bob (broadcasting on the port 5001)
-./scripts/run-tui-receiver-bob-from-alice.sh
+bash ./scripts/run-tui-receiver-bob-from-alice.sh
 # A receiver Carol
-./scripts/run-tui-receiver-carol-from-bob.sh
+bash ./scripts/run-tui-receiver-carol-from-bob.sh
 ```
 
 Having done that, you should see a UI in the sender terminal.
