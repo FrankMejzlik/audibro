@@ -7,8 +7,7 @@ authors = ["Frantisek Mejzlik <frankmejzlik@proton.me>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#hab = {git = "ssh://git@github.com/FrankMejzlik/hab.git", branch = "master" }
-hab = { path = "../hab/", features = [
+hab = { git = "https://gitlab.mff.cuni.cz/mejzlikf/hab.git", branch = "master", features = [
 	#"print_times", 
 	"log_input_output",
 	"store_state",
