@@ -10,7 +10,7 @@ use cpal::{
     Device, SupportedStreamConfig,
 };
 use minimp3::{Decoder, Frame};
-use mp3lame_encoder::{Builder, FlushNoGap, InterleavedPcm, Encoder};
+use mp3lame_encoder::{Builder, Encoder, FlushNoGap, InterleavedPcm};
 use std::io::{Cursor, Read};
 use std::{
     fmt::Debug,
@@ -278,7 +278,6 @@ fn build_mp3_encoder(num_channels: u16, sample_rate: u32) -> Encoder {
         .set_quality(mp3lame_encoder::Quality::Best)
         .expect("set quality");
     mp3_encoder.build().expect("To initialize LAME encoder")
-    
 }
 
 fn run<T>(

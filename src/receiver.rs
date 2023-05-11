@@ -7,6 +7,7 @@ use hab::{utils, Receiver, ReceiverParams, ReceiverTrait};
 use rodio::Decoder as RodioDecoder;
 use std::io::{stdout, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc::channel;
 use std::sync::Arc;
 use std::time::Duration;
 // ---
@@ -14,8 +15,9 @@ use std::time::Duration;
 #[allow(unused_imports)]
 use hab::{debug, error, info, trace, warn};
 
-use crate::config::SignerInst;
+use crate::config::{self, SignerInst};
 use crate::sliding_buffer::SlidingBuffer;
+use crate::tui::TerminalUiReceiver;
 
 #[derive(Debug)]
 pub struct AudiBroReceiverParams {
@@ -63,28 +65,43 @@ impl AudiBroReceiver {
         let my_buffer = SlidingBuffer::new();
         let my_buffer_clone = my_buffer.clone();
 
+        let (tx, rx) = channel();
+        let tx_clone = tx.clone();
+
         if self.params.tui {
             println!("Receiving the audio broadcast...");
             std::thread::spawn(move || {
-				let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
-				let sink = rodio::Sink::try_new(&handle).unwrap();
-				loop {
-					let buffer_to_play = my_buffer.clone();
+                let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
+                let sink = rodio::Sink::try_new(&handle).unwrap();
+                loop {
+                    let buffer_to_play = my_buffer.clone();
 
+                    let source = match RodioDecoder::new(buffer_to_play) {
+                        Ok(x) => x,
+                        Err(_) => {
+                            if let Err(_) = tx_clone.send(config::WAITING_FOR_DATA.to_string()) {}
+                            std::thread::sleep(Duration::from_millis(500));
+                            continue;
+                        }
+                    };
 
-                let source = match RodioDecoder::new(buffer_to_play) {
-                    Ok(x) => x,
-                    Err(_) => {
-                        println!("Buffering...");
-                        std::thread::sleep(Duration::from_millis(500));
-                        continue;
-                    }
-                };
+                    sink.append(source);
+                    sink.sleep_until_end();
+                }
+            });
+        }
 
-                sink.append(source);
-                sink.sleep_until_end();
-            }}
-		);
+        let is_distributor = self.params.distribute.is_some();
+        let addr = self.params.target_addr.clone();
+        let target_name = self.params.target_name.clone();
+
+        // If should run with TUI
+        if self.params.tui {
+            std::thread::spawn(move || {
+                // Run the UI
+                let tui = TerminalUiReceiver::new(rx, addr, target_name, is_distributor);
+                tui.run_tui();
+            });
         }
 
         // The main loop as long as the app should run
@@ -101,7 +118,14 @@ impl AudiBroReceiver {
             if self.params.tui {
                 my_buffer_clone.append(&received_block.message);
 
-                println!("STATUS: {}", received_block.authentication);
+                info!(tag:"receiver", "STATUS: {}", received_block.authentication);
+
+                let state_str = match received_block.authentication {
+                    MessageAuthentication::Authenticated(_) => "Authenticated",
+                    MessageAuthentication::Certified(_) => "Certified",
+                    MessageAuthentication::Unverified => "Unverified",
+                };
+                tx.send(state_str.to_string()).unwrap();
             } else {
                 let mut handle = stdout().lock();
 

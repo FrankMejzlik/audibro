@@ -542,7 +542,7 @@ checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 [[package]]
 name = "hab"
 version = "0.1.0"
-source = "git+https://gitlab.mff.cuni.cz/mejzlikf/hab.git?branch=master#3175717f4717cfa4308661f9cbf0d5d27bb01161"
+source = "git+https://gitlab.mff.cuni.cz/mejzlikf/hab.git?branch=master#16d2a38be36f398e0c7e00c569ac8f70987034a3"
 dependencies = [
  "bincode",
  "bitreader",

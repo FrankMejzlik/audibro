@@ -11,6 +11,11 @@ use hab::{utils, HorstSigScheme};
 // ---
 use crate::config;
 
+pub const WAITING_FOR_DATA: &str = "...waiting for data...";
+// pub const AUTH_LABEL: &str = "Authenticated";
+// pub const CART_LABEL: &str = "Certified";
+// pub const UNVER_LABEL: &str = "Unverified";
+
 /// A directory where we store the logs by default (e.g. when you run `cargo run`)
 pub const LOGS_DIR: &str = "logs/";
 /// A directory for output of signed blocks that the SENDER boradcasts.

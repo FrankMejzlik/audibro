@@ -1,6 +1,6 @@
 # AudiBro
 
-> This software is a part of the Master thesis of *Frantisek Mejzlik* titled **Fast hash-based signing protocol for message stream authentication**.
+> This software is an example for new [HAB](https://gitlab.mff.cuni.cz/mejzlikf/hab) library; both are part of the Master thesis of *Frantisek Mejzlik* titled **Fast hash-based signing protocol for message stream authentication**.
 
 **Audi**o **Bro**adcaster is an example application for real-time audio broadcasting. It demonstrates the usage of the [HAB crate](https://gitlab.mff.cuni.cz/mejzlikf/hab) for post-quantum data stream authentication based on hash-based signatures in a real-world scenario.
 
