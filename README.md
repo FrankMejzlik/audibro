@@ -75,7 +75,7 @@ sudo docker run --rm --name bob --network audinet --device /dev/snd:/dev/snd -p5
 # Unfortunately I was unable to attach twice to the same mapped output device from two different containers
 ```
 
-Having done that, you should see a UI in the sender terminal.
+Having done that, you should see the UIs in all the terminals.
 
 ![AudiBro TUI](docs/img/audibro-tui-playing.png)
 
