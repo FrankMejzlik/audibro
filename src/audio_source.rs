@@ -258,6 +258,9 @@ fn encode_waveform_f64(
 			if i % num_channels as usize == 0 {
 				new_wave_buffer.push(*w);
 			}
+			if i % num_channels as usize == 1 {
+				new_wave_buffer.push(*w);
+			}
         }
 	}
 	let wave_buffer = &new_wave_buffer;
