@@ -1,3 +1,4 @@
+
 use std::{
     fs::File,
     sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender},
@@ -66,7 +67,7 @@ impl AudioSource {
         std::thread::spawn(move || {
             let num_channels = config_clone.channels();
             let sample_rate = config_clone.sample_rate().0;
-            let mut mp3_encoder = build_mp3_encoder(num_channels, sample_rate);
+            let mut mp3_encoder = build_mp3_encoder(sample_rate);
             loop {
                 let received = rxx.recv().unwrap();
                 let mp3_buffer = encode_waveform_f64(&received, num_channels, &mut mp3_encoder);
@@ -241,33 +242,51 @@ fn encode_waveform_f64(
     num_channels: u16,
     mp3_encoder: &mut mp3lame_encoder::Encoder,
 ) -> Vec<u8> {
-    let input = InterleavedPcm(wave_buffer);
+	
+	let mut new_wave_buffer = vec![];
 
-    let mut mp3_out_buffer = Vec::new();
-    mp3_out_buffer.reserve(mp3lame_encoder::max_required_buffer_size(
-        input.0.len() / num_channels as usize,
-    ));
+    if num_channels == 1 {
+		
+        for w in wave_buffer {
+			new_wave_buffer.push(*w);
+            new_wave_buffer.push(*w);
+        }
+    } else if num_channels == 2 {
+		new_wave_buffer.extend_from_slice(wave_buffer);
+	} else {
+		for (i, w) in wave_buffer.iter().enumerate() {
+			if i % num_channels as usize == 0 {
+				new_wave_buffer.push(*w);
+			}
+        }
+	}
+	let wave_buffer = &new_wave_buffer;
+	let num_channels = 2;
 
-    let encoded_size = mp3_encoder
-        .encode(input, mp3_out_buffer.spare_capacity_mut())
-        .expect("To encode");
-    unsafe {
-        mp3_out_buffer.set_len(mp3_out_buffer.len().wrapping_add(encoded_size));
-    }
-    let encoded_size = mp3_encoder
-        .flush::<FlushNoGap>(mp3_out_buffer.spare_capacity_mut())
-        .expect("to flush");
-    unsafe {
-        mp3_out_buffer.set_len(mp3_out_buffer.len().wrapping_add(encoded_size));
-    }
-    mp3_out_buffer
+	let input = InterleavedPcm(&wave_buffer);
+	let mut mp3_out_buffer = Vec::new();
+	mp3_out_buffer.reserve(mp3lame_encoder::max_required_buffer_size(
+		input.0.len() / num_channels as usize
+	));
+
+	let encoded_size = mp3_encoder
+		.encode(input, mp3_out_buffer.spare_capacity_mut())
+		.expect("To encode");
+	unsafe {
+		mp3_out_buffer.set_len(mp3_out_buffer.len().wrapping_add(encoded_size));
+	}
+	let encoded_size = mp3_encoder
+		.flush::<FlushNoGap>(mp3_out_buffer.spare_capacity_mut())
+		.expect("to flush");
+	unsafe {
+		mp3_out_buffer.set_len(mp3_out_buffer.len().wrapping_add(encoded_size));
+	}
+	return mp3_out_buffer;
 }
 
-fn build_mp3_encoder(num_channels: u16, sample_rate: u32) -> Encoder {
+fn build_mp3_encoder(sample_rate: u32) -> Encoder {
     let mut mp3_encoder = Builder::new().expect("Create LAME builder");
-    mp3_encoder
-        .set_num_channels(num_channels as u8)
-        .expect("set channels");
+    mp3_encoder.set_num_channels(2).expect("set channels");
     mp3_encoder
         .set_sample_rate(sample_rate)
         .expect("set sample rate");
