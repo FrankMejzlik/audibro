@@ -23,5 +23,5 @@ test_unit:
 test_integration:
   stage: test
   script:
-    - cargo build --release
+    - cargo build --release --features debug
     - python3 tests/tests.py
