@@ -36,6 +36,6 @@ mp3lame-encoder = "0.1"
 
 
 [features]
-default = ["debug"]
+default = []
 debug = []
 simulate_stdin = []

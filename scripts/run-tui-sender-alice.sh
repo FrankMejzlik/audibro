@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BUILD_TYPE=debug
-if [ "$1" = "release" ]; then
+BUILD_TYPE=release
+if [ "$1" = "debug" ]; then
   BUILD_TYPE=$1
 fi
 echo "Running TUI sender as $BUILD_TYPE..."

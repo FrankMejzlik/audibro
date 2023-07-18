@@ -49,12 +49,12 @@ pub const SIM_INPUT_PERIOD: Option<std::time::Duration> = None;
 cfg_if! {
     // *** PRODUCTION ***
     if #[cfg(not(feature = "debug"))] {
-        use sha3::Sha3_512;
+        use sha3::Sha3_256;
 
         /// Size of the hashes in a Merkle tree
-        const N: usize = 512 / 8;
+        const N: usize = 256 / 8;
         /// Number of SK segments in signature
-        const K: usize = 32;
+        const K: usize = 16;
         /// Depth of the Merkle tree (without the root layer)
         const TAU: usize = 16;
 
@@ -63,10 +63,10 @@ cfg_if! {
         type CsPrng = ChaCha20Rng;
 
         /// Maximum number of secure signature per one key
-        const KEY_CHARGES: usize = 20;
+        const KEY_CHARGES: usize = 16;
 
         // --- Hash function ---
-        type TreeHashFn = Sha3_512;
+        type HashFn = Sha3_256;
     }
     // *** DEBUG ***
     else {
@@ -93,6 +93,7 @@ cfg_if! {
 
 // ---
 const T: usize = 2_usize.pow(TAU as u32);
+
 
 pub type SignerInst = HorstSigScheme<N, K, TAU, { TAU + 1 }, T, KEY_CHARGES, CsPrng, HashFn>;
 

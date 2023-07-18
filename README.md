@@ -44,9 +44,12 @@ sudo docker network create audinet
 
 ## **Running**
 
+> The default settings use the `HORST-SHA3-256` instance that offers 128 bits of security.
+
  It is recommended to have three terminal windows where you can run a sender (Alice), a receiver + distributor (Bob) and a receiver (Carol). In the `scripts` directory, there are convenience scripts that will get your radio setup running in no time. Feel free to inspect and play with the different arguments by inspecting those scripts.
 
 Each of the actors will run in separate environment directory inside `env` --- i.e. `sender-alice`, `receiver-bob` and `receiver-carol`. The broadcast topology would look like this:
+
 
 ![Demo sender/distributor/receiver topology](docs/img/audibro-seup.png)
 
@@ -67,12 +70,13 @@ bash ./scripts/run-tui-receiver-carol-from-bob.sh
 
 ```sh
 # An original sender Alice (broadcasting on the port 5000)
-sudo docker run --rm --name alice --network audinet --device /dev/snd:/dev/snd -p5000:5000 -it audibro bash ./scripts/run-tui-sender-alice.sh
-# A receiver and distributor Bob (broadcasting on the port 5001)
-# The Alice container must be running when launching Bob's --- The IP address of the container must be known
-sudo docker run --rm --name bob --network audinet --device /dev/snd:/dev/snd -p5001:5001 -it audibro bash ./scripts/run-tui-receiver-bob-from-alice-docker.sh `sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' alice`
-# A receiver Carol
-# Unfortunately I was unable to attach twice to the same mapped output device from two different containers
+sudo docker run --name audibro --device /dev/snd:/dev/snd audibro
+
+# Alice
+sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-sender-alice.sh
+sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-receiver-bob-from-alice.sh
+sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-receiver-carol-from-bob.sh
+
 ```
 
 Having done that, you should see the UIs in all the terminals.
@@ -95,8 +99,8 @@ To run the integration tests, you must have Python 3 with some packages installe
 
 ```sh
 pip3 install -r tests/requirements.txt
-# Build the application in release mode and make sure that feature "debug" is on in the `Cargo.toml` file
-cargo build --release
+# The `debug` feature is needed since the test scenarios are bound to the specific scheme config
+cargo build --release --features debug
 python3 tests/tests.py
 ```
 
