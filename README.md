@@ -38,8 +38,6 @@ If you don't want to alter your host system, just use Docker.
 ```sh
 # Build the image
 sudo docker build -t audibro .
-# Create a network for the containers
-sudo docker network create audinet
 ```
 
 ## **Running**
@@ -58,24 +56,26 @@ To run the setup, execute each of the following commands in your prepared termin
 ### Native
 
 ```sh
-# An original sender Alice (broadcasting on the port 5000)
+# The original sender Alice (broadcasting on the port 5000)
 bash ./scripts/run-tui-sender-alice.sh
-# A receiver and distributor Bob (broadcasting on the port 5001)
+# The receiver and distributor Bob (broadcasting on the port 5001)
 bash ./scripts/run-tui-receiver-bob-from-alice.sh
-# A receiver Carol
+# The receiver Carol
 bash ./scripts/run-tui-receiver-carol-from-bob.sh
 ```
 
 ### Docker
 
 ```sh
-# An original sender Alice (broadcasting on the port 5000)
-sudo docker run --name audibro --device /dev/snd:/dev/snd audibro
+# Run the container in detached mode
+sudo docker run -d --rm --name audibro -it --device /dev/snd:/dev/snd audibro
 
-# Alice
-sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-sender-alice.sh
-sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-receiver-bob-from-alice.sh
-sudo docker exec -it -p5001:5001 audibro bash ./scripts/run-tui-receiver-carol-from-bob.sh
+# The original sender Alice (broadcasting on the port 5000)
+sudo docker exec -it audibro bash ./scripts/run-tui-sender-alice.sh
+# The receiver and distributor Bob (broadcasting on the port 5001)
+sudo docker exec -it audibro bash ./scripts/run-tui-receiver-bob-from-alice.sh
+# The receiver Carol
+sudo docker exec -it audibro bash ./scripts/run-tui-receiver-carol-from-bob.sh
 
 ```
 
